@@ -1,2 +1,5 @@
 # BlindAssistantServices
-you shall not pass
+
+ -- you shall not pass --
+ 
+ wealth generator algorithms
