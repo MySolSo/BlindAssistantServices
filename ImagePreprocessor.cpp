@@ -48,7 +48,7 @@ std::vector<cv::Point2f> ImagePreprocessor::getRelativeCornersFromImage ()
 	for (int i = 0; i < 4; i++)
 	{
 		circle(src1, corners[i], 5, cv::Scalar(255, 0, 0), 2);
-		std::cout << corners[i].x << " " << corners[i].y << std::endl;
+	//	std::cout << corners[i].x << " " << corners[i].y << std::endl;
 	}
 	cv::imshow("paper", src1);
 	cv::waitKey(0);
@@ -62,6 +62,20 @@ std::vector<cv::Point2f> ImagePreprocessor::getRelativeCornersFromImage ()
 	for (int i = 3; i > -1; --i)
 		returns.push_back(corners[i]);
 
+	std::vector<cv::Point2f> cornerIndexingCorrection;
+	cornerIndexingCorrection.push_back(returns[2]);
+	cornerIndexingCorrection.push_back(returns[1]);
+	cornerIndexingCorrection.push_back(returns[0]);
+	cornerIndexingCorrection.push_back(returns[3]);
+
+	
+
+	for (auto index = 0; index < 4; ++index)
+	{
+		returns[index] = cornerIndexingCorrection[index];
+		std::cout << std::endl << returns[index].x << "   " << returns[index].y << std::endl;
+	}
+	
 	return returns;
 }
 cv::Mat ImagePreprocessor::perspectiveCorrection(const std::vector<cv::Point2f>& cornerPoints)
