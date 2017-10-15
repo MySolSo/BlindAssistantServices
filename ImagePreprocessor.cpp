@@ -6,6 +6,7 @@
 #include "opencv2/imgproc/imgproc.hpp"
 
 #include <iostream>
+#include <opencv2/highgui/highgui.hpp>
 
 const int blockSize = 11;//27
 
@@ -16,7 +17,7 @@ ImagePreprocessor::~ImagePreprocessor()
 {
 }
 
-std::vector<cv::Point2f> ImagePreprocessor::getRelativeCornersFromImage ()
+std::vector<cv::Point2f> ImagePreprocessor::getRelativeCornersFromImage()
 {
 	cv::namedWindow("Original image", CV_WINDOW_AUTOSIZE);
 	imshow("Original image", _image);
@@ -48,7 +49,7 @@ std::vector<cv::Point2f> ImagePreprocessor::getRelativeCornersFromImage ()
 	for (int i = 0; i < 4; i++)
 	{
 		circle(src1, corners[i], 5, cv::Scalar(255, 0, 0), 2);
-	//	std::cout << corners[i].x << " " << corners[i].y << std::endl;
+		std::cout << corners[i].x << " " << corners[i].y << std::endl;
 	}
 	cv::imshow("paper", src1);
 	cv::waitKey(0);
@@ -62,20 +63,6 @@ std::vector<cv::Point2f> ImagePreprocessor::getRelativeCornersFromImage ()
 	for (int i = 3; i > -1; --i)
 		returns.push_back(corners[i]);
 
-	std::vector<cv::Point2f> cornerIndexingCorrection;
-	cornerIndexingCorrection.push_back(returns[2]);
-	cornerIndexingCorrection.push_back(returns[1]);
-	cornerIndexingCorrection.push_back(returns[0]);
-	cornerIndexingCorrection.push_back(returns[3]);
-
-	
-
-	for (auto index = 0; index < 4; ++index)
-	{
-		returns[index] = cornerIndexingCorrection[index];
-		std::cout << std::endl << returns[index].x << "   " << returns[index].y << std::endl;
-	}
-	
 	return returns;
 }
 cv::Mat ImagePreprocessor::perspectiveCorrection(const std::vector<cv::Point2f>& cornerPoints)
@@ -144,15 +131,20 @@ std::vector<cv::Mat> ImagePreprocessor::getColorRefinedImageInLines(cv::Mat imag
 	for (auto contour : contours)
 	{
 		cv::Rect r = boundingRect(contour);
-	if (r.height < 40)
+		if (r.height < 40 && r.height > 20)
+		{
+			responses.insert(responses.begin(),temp(r));
+			std::cout << r.x << " " << r.y << " " << r.width << " " << r.height << std::endl;
+			/// TODO: sort that vector ASAP sdfs 
+		}
+	}
+	
+	/*for (auto disp : responses)
 	{
-		responses.push_back(temp(r));
-	imshow("rect", temp(r));
+		cv::imshow("rect", disp);
 		cv::waitKey(0);
-
-		std::cout << r.x << " " << r.y << " " << r.width << " " << r.height << std::endl;
 	}
-	}
+*/
 	drawContours(temp, contours2, -1, cv::Scalar(0, 0, 255), 2);
 	imshow("cnts", temp);
 	cv::namedWindow("Display final window", cv::WINDOW_AUTOSIZE);
