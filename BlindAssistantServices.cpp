@@ -4,20 +4,23 @@
 #include "stdafx.h"
 #include "ParseLetters.h"
 #include "ImagePreprocessor.h"
+#include "NNLetterRecognition.h"
+#include <iostream>
 
 int main()
 {
-	const cv::String name_of_files = "test.png";
+	const cv::String name_of_files = "test.jpg";
 
 	const auto image = cv::imread(name_of_files, CV_LOAD_IMAGE_COLOR);
 	assert(image.data);
 
 	ImagePreprocessor preprocessor(image);
 
-	auto corners = preprocessor.getRelativeCornersFromImage();
+	/*auto corners = preprocessor.getRelativeCornersFromImage();
 	auto corneredImage = preprocessor.perspectiveCorrection(corners);
-	auto preprocessedLines = preprocessor.getColorRefinedImageInLines(corneredImage);
-
+	*/
+	auto preprocessedLines = preprocessor.getColorRefinedImageInLines(image);//corneredImage);
+	/*
 	ParseLetters parser(image);
 	int blackLimit = parser.getAverageBlackValue();
 	auto lineLetters = parser.getVectorOfLettersFromLine(preprocessedLines,blackLimit);
@@ -27,6 +30,17 @@ int main()
 		cv::destroyWindow("BlackNiggaWindowForYouFella");
 		cv::imshow("BlackNiggaWindowForYouFella", letter);
 		cvWaitKey(0);
+	}*/
+
+	std::cout << "--------------------------------------" << std::endl;
+
+	try {
+		NNLetterRecognition theDamnNN("trainingResults.txt");
+		theDamnNN.generateFirstLayerOutpuToActivationVector(preprocessedLines[0]);
+	}
+	catch (char* error)
+	{
+		std::cout << error << std::endl;
 	}
 
     return 0;
