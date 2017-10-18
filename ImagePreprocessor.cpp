@@ -65,44 +65,84 @@ std::vector<cv::Point2f> ImagePreprocessor::getRelativeCornersFromImage()
 
 	return returns;
 }
+/// TODO: Review code
 cv::Mat ImagePreprocessor::perspectiveCorrection(const std::vector<cv::Point2f>& cornerPoints)
 {
 
-	//the display window was resized for better fit on screen 
-	cv::namedWindow("Display window", cv::WINDOW_NORMAL);
-	cv::resizeWindow("Display window", 800, 800);
+		//target image is loaded
+		cv::Mat image = cv::imread("book.jpg", CV_LOAD_IMAGE_COLOR);
 
-	cv::imshow("Display window", _image); //original image
+		//the display window was resized for better fit on screen 
+		cv::namedWindow("Display window", cv::WINDOW_NORMAL);
+		cv::resizeWindow("Display window", 800, 800);
 
-										 //corner pixels (coordinates)
-	std::vector<cv::Point2f> sourcePoints;
-	sourcePoints.push_back(cornerPoints[0]);
-	sourcePoints.push_back(cornerPoints[1]);
-	sourcePoints.push_back(cornerPoints[2]);
-	sourcePoints.push_back(cornerPoints[3]);
+		cv::imshow("Display window", image); //original image
 
-	cv::Size size(300, 400);//setting the destination image size
-							//most books and sheets of paper are 3:4, but we should discuss this
+											 //corner pixels (coordinates)
+		std::vector<cv::Point2f> sourcePoints;
+		sourcePoints.push_back(cornerPoints[0]);
+		sourcePoints.push_back(cornerPoints[1]);
+		sourcePoints.push_back(cornerPoints[2]);
+		sourcePoints.push_back(cornerPoints[3]);
 
-							//the destination points are set
-	std::vector<cv::Point2f> destinationPoints;
-	destinationPoints.push_back(cv::Point2f(0, 0));
-	destinationPoints.push_back(cv::Point2f(size.width - 1, 0));
-	destinationPoints.push_back(cv::Point2f(size.width - 1, size.height - 1));
-	destinationPoints.push_back(cv::Point2f(0, size.height - 1));
+		cv::Size size(300, 400);//setting the destination image size
+								//most books and sheets of paper are 3:4, but we should discuss this
 
-	//creating a blank image where the new image will be saved
-	cv::Mat output = cv::Mat::zeros(size, CV_8UC3);
+								//the destination points are set
+		std::vector<cv::Point2f> destinationPoints;
+		destinationPoints.push_back(cv::Point2f(0, 0));
+		destinationPoints.push_back(cv::Point2f(size.width - 1, 0));
+		destinationPoints.push_back(cv::Point2f(size.width - 1, size.height - 1));
+		destinationPoints.push_back(cv::Point2f(0, size.height - 1));
 
-	//homography calculation
-	cv::Mat homography = cv::findHomography(sourcePoints, destinationPoints);
+		//creating a blank image where the new image will be saved
+		cv::Mat output = cv::Mat::zeros(size, CV_8UC3);
 
-	//perspective correction
-	cv::warpPerspective(_image, output, homography, size);
+		//homography calculation
+		cv::Mat homography = cv::findHomography(sourcePoints, destinationPoints);
 
-	cv::imshow("Warped source image", output);
+		//perspective correction
+		cv::warpPerspective(image, output, homography, size);
 
-	return output;
+		cv::imshow("Warped source image", output);
+
+		return output; // should you need the cv::Mat
+
+	////the display window was resized for better fit on screen 
+	//cv::namedWindow("Display window", cv::WINDOW_NORMAL);
+	//cv::resizeWindow("Display window", 800, 800);
+
+	//cv::imshow("Display window", _image); //original image
+
+	//									 //corner pixels (coordinates)
+	//std::vector<cv::Point2f> sourcePoints;
+	//sourcePoints.push_back(cornerPoints[0]);
+	//sourcePoints.push_back(cornerPoints[1]);
+	//sourcePoints.push_back(cornerPoints[2]);
+	//sourcePoints.push_back(cornerPoints[3]);
+
+	//cv::Size size(300, 400);//setting the destination image size
+	//						//most books and sheets of paper are 3:4, but we should discuss this
+
+	//						//the destination points are set
+	//std::vector<cv::Point2f> destinationPoints;
+	//destinationPoints.push_back(cv::Point2f(0, 0));
+	//destinationPoints.push_back(cv::Point2f(size.width - 1, 0));
+	//destinationPoints.push_back(cv::Point2f(size.width - 1, size.height - 1));
+	//destinationPoints.push_back(cv::Point2f(0, size.height - 1));
+
+	////creating a blank image where the new image will be saved
+	//cv::Mat output = cv::Mat::zeros(size, CV_8UC3);
+
+	////homography calculation
+	//cv::Mat homography = cv::findHomography(sourcePoints, destinationPoints);
+
+	////perspective correction
+	//cv::warpPerspective(_image, output, homography, size);
+
+	//cv::imshow("Warped source image", output);
+
+	//return output;
 }
 std::vector<cv::Mat> ImagePreprocessor::getColorRefinedImageInLines(cv::Mat image)
 {
@@ -143,8 +183,8 @@ std::vector<cv::Mat> ImagePreprocessor::getColorRefinedImageInLines(cv::Mat imag
 	{
 		cv::imshow("rect", disp);
 		cv::waitKey(0);
-	}
-*/
+	}*/
+
 	drawContours(temp, contours2, -1, cv::Scalar(0, 0, 255), 2);
 	imshow("cnts", temp);
 	cv::namedWindow("Display final window", cv::WINDOW_AUTOSIZE);

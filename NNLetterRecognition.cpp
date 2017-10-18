@@ -7,6 +7,20 @@
 #include <numeric>
 #include <opencv2/core/mat.hpp>
 
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string>
+#include <unordered_map>
+
+const int step = 5;
+const int filterRows = 10;
+const int filterCols = 10;
+
+double numberOfImages = 0;
+std::ofstream fout("text.out");
+
 double NNLetterRecognition::getCurrentPixelRaport(double imagePixel, double filterPixel)
 {
 	double biggerOne;
@@ -46,6 +60,123 @@ double NNLetterRecognition::calculateFilterRatioAKANeuronActivity(std::vector<do
 {
 	//std::cout<<"length" << std::accumulate(activities.begin(), activities.end(), 0.0) << " --";
 	return (std::accumulate(activities.begin(), activities.end(), 0.0) / activities.size());
+}
+
+double NNLetterRecognition::rezultatSablon(std::vector<double> Litera, std::vector<int> Sablon)
+{
+	double Suma_Vector = 0;
+	for (int i = 0; i < Litera.size(); i++)
+	{
+		if (Sablon[i] == 0)
+		{
+			Litera[i] = 0.0;
+		}
+		else
+		{
+			Litera[i] = 1.0;
+			Suma_Vector++;
+		}
+
+	}
+	return Suma_Vector;
+}
+
+
+void NNLetterRecognition::writeFilter(cv::Mat filter)
+{
+	for (int iFilter = 0; iFilter < filter.rows; iFilter++)
+	{
+		for (int jFilter = 0; jFilter < filter.cols; jFilter++)
+		{
+			fout << filter.at<double>(iFilter, jFilter) << ' ';
+		}
+		fout << std::endl;
+	}
+	fout << std::endl;
+	fout << std::endl;
+}
+std::vector<cv::Mat> NNLetterRecognition::createFilters(cv::Mat image)
+{
+	cvtColor(image, image, cv::COLOR_BGR2GRAY);
+	image.convertTo(image, CV_64FC1);
+
+	cv::Mat filter;
+	filter = cv::Mat::zeros(filterRows, filterCols, CV_64FC1);
+
+	std::vector<cv::Mat>filters;
+	for (int iMat = 0; iMat < image.rows - filterRows; iMat += step)
+	{
+		for (int jMat = 0; jMat < image.cols - filterCols; jMat += step)
+		{
+
+			for (int iFilter = 0; iFilter < filter.rows; iFilter++)
+			{
+				for (int jFilter = 0; jFilter < filter.cols; jFilter++)
+				{
+					filter.at<double>(iFilter, jFilter) = image.at<double>(iFilter + iMat, jFilter + jMat) / 255.0;
+				}
+			}
+			filters.push_back(filter.clone());
+			filter = cv::Mat::zeros(filterRows, filterCols, CV_64FC1);
+		}
+	}
+	return filters;
+}
+void NNLetterRecognition::modifyFilters(cv::Mat image, std::vector<cv::Mat> &filters)
+{
+	cvtColor(image, image, cv::COLOR_BGR2GRAY);
+	image.convertTo(image, CV_64FC1);
+
+	cv::Mat filter;
+	filter = cv::Mat::zeros(filterRows, filterCols, CV_64FC1);
+	int currentFilter = 0;
+	for (int iMat = 0; iMat < image.rows - filterRows; iMat += step)
+	{
+		for (int jMat = 0; jMat < image.cols - filterCols; jMat += step, currentFilter++)
+		{
+			for (int iFilter = 0; iFilter < filterRows; iFilter++)
+			{
+				for (int jFilter = 0; jFilter < filterCols; jFilter++)
+				{
+					filters[currentFilter].at<double>(iFilter, jFilter) += image.at<double>(iFilter + iMat, jFilter + jMat) / 255.0;
+				}
+
+			}
+		}
+	}
+}
+std::vector<cv::Mat> NNLetterRecognition::generateFilters()
+{
+	int norm_sizeX = 30;
+	int norm_sizeY = 30;
+
+	cv::VideoCapture images("./letter.jpg");
+	std::vector<cv::Mat> filters;
+	cv::Mat image, norm_image(norm_sizeX, norm_sizeY, CV_64F);
+	cv::imshow("asd", images.get(0));
+	cvWaitKey(0);
+	if (images.isOpened())
+	{
+		if (images.read(image))
+		{
+			numberOfImages++;
+			resize(image, norm_image, cv::Size(norm_sizeX, norm_sizeY));
+			filters = createFilters(norm_image);
+		}
+	}
+	while (images.isOpened())
+	{
+		if (images.read(image))
+		{
+			numberOfImages++;
+			resize(image, norm_image, cv::Size(norm_sizeX, norm_sizeY));
+			modifyFilters(norm_image, filters);
+		}
+		else
+			images.release();
+	}
+
+	return filters;
 }
 
 
@@ -198,3 +329,51 @@ std::vector<double> NNLetterRecognition::generateFirstLayerOutpuToActivationVect
 	return NNactivities;
 }
 
+void NNLetterRecognition::startGeneratingFilters()
+{
+
+	std::vector<cv::Mat> filters = generateFilters();
+	std::cout << filters.size();
+	cv::Mat img(filterRows, filterCols, CV_64F);
+	//namedWindow("brack", WINDOW_AUTOSIZE);
+	for (int i = 0; i<filters.size(); i += 1)
+	{
+		resize(filters[i], img, img.size(), 0, 0, cv::INTER_NEAREST);
+		for (int k = 0; k < img.rows; k++)
+			for (int j = 0; j < img.cols; j++)
+				img.at<double>(k, j) /= numberOfImages;
+		imshow("brack", img);
+		writeFilter(img);
+		cv::waitKey(0);
+	}
+}
+
+std::vector<int> NNLetterRecognition::generatingFunctionActivationVector(const std::vector<std::vector<double>>& activationOfFilters)
+{
+	const unsigned numberOfFilters = activationOfFilters[0].size();
+	const unsigned numberOfActivationVectors = activationOfFilters.size();
+	const double threshold = 85; //selected randomly; 
+
+
+	std::vector<double> result(numberOfFilters, 0.0);
+	for (auto &&vector : activationOfFilters)
+	{
+		std::transform(result.begin(), result.end(), vector.begin(), result.begin(), std::plus<double>());
+	}
+	std::vector<int> generatedTemplate(numberOfFilters, 0);
+	for (auto indexOfResult = 0; indexOfResult < numberOfFilters; ++indexOfResult)
+	{
+		result[indexOfResult] /= numberOfActivationVectors;
+		if (result[indexOfResult] >= threshold)
+		{
+			generatedTemplate[indexOfResult] = 1;
+		}
+	}
+
+	return generatedTemplate;
+}
+
+void NNLetterRecognition::createTemplates(std::unordered_map<char, std::vector<int>> templates, const char letterTested, const std::vector<std::vector<double>>& activationOfFilters)
+{
+	templates.emplace(letterTested, generatingFunctionActivationVector(activationOfFilters)); //the implementation for the function can be changed eventually
+}
