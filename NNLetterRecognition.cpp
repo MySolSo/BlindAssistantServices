@@ -147,8 +147,9 @@ void NNLetterRecognition::modifyFilters(cv::Mat image, std::vector<cv::Mat> &fil
 }
 std::vector<cv::Mat> NNLetterRecognition::generateFilters()
 {
-	int norm_sizeX = 30;
-	int norm_sizeY = 30;
+	int norm_sizeX = 15;
+	int norm_sizeY = 15;
+	//Is 15x15 enough? Let's try it.
 
 	cv::VideoCapture images("./letter.jpg");
 	std::vector<cv::Mat> filters;
@@ -195,7 +196,7 @@ NNLetterRecognition::NNLetterRecognition(const char* nameOfTrainingResultFile)
 	}
 	else
 	{
-		std::cout << "Yo nigga training code haves identifier problems at" << bufferForIdentifier;
+		std::cout << "Yo nigga training code has identifier problems at" << bufferForIdentifier;
 	}
 
 	trainingData >> bufferForIdentifier;
@@ -230,7 +231,7 @@ NNLetterRecognition::NNLetterRecognition(const char* nameOfTrainingResultFile)
 	else
 	{
 		//throw bufferForIdentifier;
-		std::cout << "Yo nigga training code haves identifier problems." << bufferForIdentifier;
+		std::cout << "Yo nigga training code has identifier problems." << bufferForIdentifier;
 	}
 
 	trainingData >> bufferForIdentifier;
@@ -243,7 +244,7 @@ NNLetterRecognition::NNLetterRecognition(const char* nameOfTrainingResultFile)
 	else
 	{
 		//throw bufferForIdentifier;
-		std::cout << "Yo nigga training code haves identifier problems." << bufferForIdentifier;
+		std::cout << "Yo nigga training code has identifier problems." << bufferForIdentifier;
 	}
 
 	std::vector<int> sablon;
