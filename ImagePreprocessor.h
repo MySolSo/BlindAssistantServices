@@ -14,7 +14,7 @@ public:
 	~ImagePreprocessor();
 
 	std::vector<cv::Point2f> getRelativeCornersFromImage();
-	cv::Mat perspectiveCorrection(const std::vector<cv::Point2f>& cornerPoints);
+	cv::Mat perspectiveCorrection(cv::Mat image,const std::vector<cv::Point2f>& cornerPoints);
 	std::vector<cv::Mat> getColorRefinedImageInLines(cv::Mat image);
 };
 

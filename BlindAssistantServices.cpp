@@ -9,17 +9,20 @@
 
 int main()
 {
-	const cv::String name_of_files = "test.png";
+	const cv::String name_of_files = "test.jpg";
 
 	const auto image = cv::imread(name_of_files, CV_LOAD_IMAGE_COLOR);
 	assert(image.data);
 
+	cv::Mat copyOfImage = image;
+
 	ImagePreprocessor preprocessor(image);
 
-	//auto corners = preprocessor.getRelativeCornersFromImage();
-	//auto corneredImage = preprocessor.perspectiveCorrection(corners);
+
+	auto corners = preprocessor.getRelativeCornersFromImage();
+	auto corneredImage = preprocessor.perspectiveCorrection(copyOfImage, corners);
 	//
-	auto preprocessedLines = preprocessor.getColorRefinedImageInLines(image);//corneredImage);
+	auto preprocessedLines = preprocessor.getColorRefinedImageInLines(corneredImage);//corneredImage);
 	//
 	/*ParseLetters parser(image);
 	int blackLimit = parser.getAverageBlackValue();
@@ -58,4 +61,6 @@ int main()
 
     return 0;
 }
+
+
 
