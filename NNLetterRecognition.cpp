@@ -25,6 +25,7 @@ double NNLetterRecognition::getCurrentPixelRaport(double imagePixel, double filt
 		smallerOne = imagePixel;
 	}
 
+	//              1- for you know it
 	double difference = 1 - (biggerOne - smallerOne);
 
 	//if (imagePixel > filterPixel)

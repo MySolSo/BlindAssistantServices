@@ -9,9 +9,12 @@ namespace cv {
 class NNTrainer
 {
 private:
-	const int step = 10;
-	const int filterRows = 10;
-	const int filterCols = 10;
+	const int step = 5;
+	const int filterRows = 5;
+	const int filterCols = 5;
+
+	int norm_sizeX = 15;
+	int norm_sizeY = 15;
 
 	double numberOfImages = 0;
 

@@ -51,7 +51,8 @@ std::vector<cv::Mat> NNTrainer::createFilters(cv::Mat image)
 			{
 				for (int jFilter = 0; jFilter < filter.cols; jFilter++)
 				{
-					filter.at<double>(iFilter, jFilter) = 1 - (image.at<double>(iFilter + iMat, jFilter + jMat) / 255.0);
+					//          add 1 - etc for images with white background 
+					filter.at<double>(iFilter, jFilter) = (image.at<double>(iFilter + iMat, jFilter + jMat) / 255.0);
 				}
 			}
 			filters.push_back(filter.clone());
@@ -85,14 +86,12 @@ void NNTrainer::modifyFilters(cv::Mat image, std::vector<cv::Mat> &filters)
 }
 std::vector<cv::Mat> NNTrainer::generateFilters(const char* pathToSetOfPics)
 {
-	int norm_sizeX = 30;
-	int norm_sizeY = 30;
 
 	cv::VideoCapture images(pathToSetOfPics);
 	std::vector<cv::Mat> filters;
 	cv::Mat image, norm_image(norm_sizeX, norm_sizeY, CV_64F);
 	//cv::resize(image, norm_image, cv::Size(norm_sizeX, norm_sizeY));
-	cvWaitKey(0);
+	//cvWaitKey(0);
 	if (images.isOpened())
 	{
 		if (images.read(image))
@@ -124,7 +123,7 @@ void NNTrainer::startGeneratingFilters(const char* pathToSetOfPics)
 	fout.open("filters.txt", std::fstream::out | std::fstream::app);
 
 	std::vector<cv::Mat> filters = generateFilters(pathToSetOfPics);
-	std::cout << filters.size();
+	//std::cout << filters.size();
 	cv::Mat img(filterRows, filterCols, CV_64F);
 	//namedWindow("brack", WINDOW_AUTOSIZE);
 	//int nr = 0;
@@ -189,7 +188,7 @@ void NNTrainer::initActivationTablesGenerateFile(const char* nameOfFile)
 	std::fstream fileOut(nameOfFile, std::fstream::out);
 
 	fileOut << "<dimensionsLetter>" << std::endl;
-	fileOut << "30 30" << std::endl;
+	fileOut << "15 15" << std::endl;
 	fileOut << "</dimensionsLetter>" << std::endl;
 	fileOut << "<pixelStep>" << std::endl;
 	fileOut << step << std::endl;
