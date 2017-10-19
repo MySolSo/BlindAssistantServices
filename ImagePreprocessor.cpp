@@ -76,7 +76,7 @@ cv::Mat ImagePreprocessor::perspectiveCorrection(const std::vector<cv::Point2f>&
 		cv::namedWindow("Display window", cv::WINDOW_NORMAL);
 		cv::resizeWindow("Display window", 800, 800);
 
-		cv::imshow("Display window", image); //original image
+		//cv::imshow("Display window", image); //original image
 
 											 //corner pixels (coordinates)
 		std::vector<cv::Point2f> sourcePoints;
@@ -157,12 +157,12 @@ std::vector<cv::Mat> ImagePreprocessor::getColorRefinedImageInLines(cv::Mat imag
 
 	//medianBlur(image, image, 5); pt imagini zgomotoase
 
-	imshow("Display gray window", image);
+	//imshow("Display gray window", image);
 	//int imSize = int((image.cols + image.rows) / 2);
 	//int blockSize = int(imSize / 19 / 2) * 2 - 1; // /2 *2 pentru a avea un numar IMPAR
 
-	cv::imshow("th", image);
-	cv::waitKey(0);
+	//cv::imshow("th", image);
+	//cv::waitKey(0);
 	std::vector<std::vector<cv::Point> > contours;
 	std::vector<cv::Rect> contours2;
 	findContours(image, contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
@@ -186,9 +186,9 @@ std::vector<cv::Mat> ImagePreprocessor::getColorRefinedImageInLines(cv::Mat imag
 	}*/
 
 	drawContours(temp, contours2, -1, cv::Scalar(0, 0, 255), 2);
-	imshow("cnts", temp);
+	//imshow("cnts", temp);
 	cv::namedWindow("Display final window", cv::WINDOW_AUTOSIZE);
 	imshow("Display final window", image);
-	cv::waitKey(0);
+	//cv::waitKey(0);
 	return responses;
 }
