@@ -76,7 +76,7 @@ int NNLetterRecognition::getIndexOfMaximum(std::vector<double> probabilityes)
 
 NNLetterRecognition::NNLetterRecognition(const char* nameOfTraininedFilters, const char* nameOfTrainedAvtivationTables)
 {
-	
+
 	std::ifstream trainingData(nameOfTraininedFilters);
 
 	char bufferForIdentifier[20];
@@ -90,7 +90,7 @@ NNLetterRecognition::NNLetterRecognition(const char* nameOfTraininedFilters, con
 	}
 	else
 	{
-		std::cout << "Yo nigga training code haves identifier problems at" << bufferForIdentifier;
+		std::cout << "Yo nigga training code has identifier problems at" << bufferForIdentifier;
 	}
 
 	trainingData >> bufferForIdentifier;
@@ -129,7 +129,7 @@ NNLetterRecognition::NNLetterRecognition(const char* nameOfTraininedFilters, con
 	else
 	{
 		//throw bufferForIdentifier;
-		std::cout << "Yo nigga training code haves identifier problems." << bufferForIdentifier;
+		std::cout << "Yo nigga training code has identifier problems." << bufferForIdentifier;
 	}
 
 	trainingData >> bufferForIdentifier;
@@ -142,7 +142,7 @@ NNLetterRecognition::NNLetterRecognition(const char* nameOfTraininedFilters, con
 	else
 	{
 		//throw bufferForIdentifier;
-		std::cout << "Yo nigga training code haves identifier problems." << bufferForIdentifier;
+		std::cout << "Yo nigga training code has identifier problems." << bufferForIdentifier;
 	}
 
 	std::vector<int> sablon;
@@ -155,7 +155,7 @@ NNLetterRecognition::NNLetterRecognition(const char* nameOfTraininedFilters, con
 	while (std::strcmp(bufferForIdentifier, "<sablon>") == 0) {
 		trainingData >> letterIdentifyer;
 		_sablonIdentifyer.push_back(letterIdentifyer);
-		
+
 		int bufferValue;
 		for (auto i = 0; i < sizeOfSablon; ++i)
 		{
