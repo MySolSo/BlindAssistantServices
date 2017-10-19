@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
+#include <fstream>
 
 namespace cv {
 	class Mat;
@@ -14,23 +15,22 @@ private:
 	int _stepSize;
 	std::vector<double**> _filters;
 	std::vector<std::vector<int>> _sablons;
+	std::vector<char> _sablonIdentifyer;
+
+	double rezultatSablon(std::vector<double> Litera, std::vector<int> Sablon);
 
 	std::vector<std::vector<double>> convertMatToRatios(const cv::Mat letterImage);
 	double getCurrentPixelRaport(double imagePixel, double filterPixel);
 	double calculateFilterRatioAKANeuronActivity(std::vector<double> activities);
-	double rezultatSablon(std::vector<double> Litera, std::vector<int> Sablon);
+	int getIndexOfMaximum(std::vector<double> probabilityes);
 
-	std::vector<cv::Mat> generateFilters();
-	void modifyFilters(cv::Mat image, std::vector<cv::Mat> &filters);
-	std::vector<cv::Mat> createFilters(cv::Mat image);
-	void writeFilter(cv::Mat filter);
+	std::vector<std::vector<double>> generateRatioVectorFromMat(cv::Mat letterImage);
+
 public:
-	NNLetterRecognition(const char* nameOfTrainingResultFile);
+	NNLetterRecognition(const char* nameOfTrainingResultFile, const char* nameOfTraininedActivationTables);
 	~NNLetterRecognition();
 
-	std::vector<double> generateFirstLayerOutpuToActivationVector(const cv::Mat letter);
-	void startGeneratingFilters();
-	std::vector<int> generatingFunctionActivationVector(const std::vector<std::vector<double>>& activationOfFilters);
-	void createTemplates(std::unordered_map<char, std::vector<int>> templates, const char letterTested, const std::vector<std::vector<double>>& activationOfFilters);
+	std::vector<double> generateFirstLayerOutpuToActivationVector(cv::Mat letter);
+	char recognizeThisNigga(cv::Mat letter);
 };
 
