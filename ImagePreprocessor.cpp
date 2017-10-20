@@ -8,6 +8,8 @@
 #include <iostream>
 #include <opencv2/highgui/highgui.hpp>
 
+#include <map>
+
 
 const int blockSize = 11;//27
 
@@ -275,6 +277,14 @@ cv::Mat ImagePreprocessor::perspectiveCorrection(cv::Mat copy, const std::vector
 
 //return output;
 }
+struct sortingComparatorStruct
+{
+	bool operator()(double x1, double x2)
+	{
+		return x1 < x2;
+	}
+};
+
 std::vector<cv::Mat> ImagePreprocessor::getColorRefinedImageInLines(cv::Mat image)
 {
 	cv::Mat temp = cv::Mat(image);
@@ -298,14 +308,16 @@ std::vector<cv::Mat> ImagePreprocessor::getColorRefinedImageInLines(cv::Mat imag
 	std::vector<cv::Rect> contours2;
 	findContours(image, contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
 
-	std::vector<cv::Mat> responses;
+	std::map<double, cv::Mat, sortingComparatorStruct> responses;
 	for (auto contour : contours)
 	{
 		cv::Rect r = boundingRect(contour);
 		if (r.height < 40 && r.height > 20)
 		{
-			responses.insert(responses.begin(), temp(r));
+			//responses.insert(responses.begin(), temp(r));
+			responses.emplace(r.x, temp(r));
 			std::cout << r.x << " " << r.y << " " << r.width << " " << r.height << std::endl;
+
 			/// TODO: sort that vector ASAP sdfs 
 		}
 	}
@@ -321,7 +333,14 @@ std::vector<cv::Mat> ImagePreprocessor::getColorRefinedImageInLines(cv::Mat imag
 	cv::namedWindow("Display final window", cv::WINDOW_AUTOSIZE);
 	imshow("Display final window", image);
 	cv::waitKey(0);
-	return responses;
+	
+	std::vector<cv::Mat> sortedLetters;
+	for (auto element : responses)
+	{
+		sortedLetters.push_back(element.second);
+	}
+
+	return sortedLetters;
 }
 
 //////////////////////////////////////////////////

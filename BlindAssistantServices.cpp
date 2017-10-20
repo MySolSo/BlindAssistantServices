@@ -10,7 +10,7 @@
 
 int main()
 {
-	const cv::String name_of_files = "test.jpg";
+	const cv::String name_of_files = "testLine.jpg";
 
 	const auto image = cv::imread(name_of_files, CV_LOAD_IMAGE_COLOR);
 	assert(image.data);
@@ -52,28 +52,28 @@ int main()
 
 	NNTrainer trainer;
 
-	//trainer.initFilterTablesGenerateFile("filters.txt");															   //  delete to add another filter set
-	//trainer.startGeneratingFilters("letter.jpg");                                                                      // generate filters
-	//trainer.startGeneratingFilters("letterD.jpg");
-	//trainer.startGeneratingFilters("letterI.jpg");
-
+	trainer.initFilterTablesGenerateFile("filters.txt");															   //  delete to add another filter set
+	trainer.startGeneratingFilters("letter.jpg");                                                                      // generate filters
+	trainer.startGeneratingFilters("letterD.jpg");
+	trainer.startGeneratingFilters("letterI.jpg");
+		
 	std::vector<std::string> letters = { "A","B","C" };
 
 	std::string path = "./training/lower/";
 	std::string extension = ".gif";
-	/*
+	
 	for (auto letter : letters) {
 		for (auto i = 0; i < 200; ++i) {
 			system("cls");
 			std::cout << letter << " => " << (100 * (i + 1)) / 200 << "%";
 			trainer.startGeneratingFilters((path + letter + "/" + std::to_string(i) + extension).c_str());
 		}
-	}*/
+	}
 
 	NNLetterRecognition getAvtivationTablesFromGeneratedFilters("filters.txt", "activationTables.txt");
 
 
-	//for(auto i = 0; i < 200; ++i)
+	for(auto i = 0; i < 200; ++i)
 	{
 		std::vector<std::vector<double>> bigIDK;
 		bigIDK.push_back(getAvtivationTablesFromGeneratedFilters.generateFirstLayerOutpuToActivationVector(preprocessedLines[23]));

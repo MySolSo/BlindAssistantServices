@@ -89,15 +89,29 @@ std::vector<cv::Mat> NNTrainer::generateFilters(const char* pathToSetOfPics)
 
 	cv::VideoCapture images(pathToSetOfPics);
 	std::vector<cv::Mat> filters;
-	cv::Mat image, norm_image(norm_sizeX, norm_sizeY, CV_64F);
+	cv::Mat originalImageOfLetter, norm_image(norm_sizeX, norm_sizeY, CV_64F);
 	//cv::resize(image, norm_image, cv::Size(norm_sizeX, norm_sizeY));
 	//cvWaitKey(0);
 	if (images.isOpened())
 	{
-		if (images.read(image))
+		if (images.read(originalImageOfLetter))
 		{
+
+			//////////
+			//test purposes only
+			cv::imwrite("../letterImage.jpg", originalImageOfLetter);
+			//////////
+
 			numberOfImages++;
-			resize(image, norm_image, cv::Size(norm_sizeX, norm_sizeY));
+			//ADD WHITE BACKGROUND
+			cv::Mat whiteBackground(originalImageOfLetter.rows, originalImageOfLetter.cols + 3, CV_8UC3, cv::Scalar(255, 255, 255));
+			originalImageOfLetter.copyTo(whiteBackground(cv::Rect((whiteBackground.cols - originalImageOfLetter.cols)
+				/ 2, (whiteBackground.rows - originalImageOfLetter.rows) / 2, originalImageOfLetter.cols, originalImageOfLetter.rows)));
+			//that double line though.
+
+			//RESIZE TO NEEDED SIZE
+			resize(whiteBackground, norm_image, cv::Size(norm_sizeX, norm_sizeY));
+			cv::imshow("WHITE BACKGROUND", whiteBackground);
 			cv::imshow("asd", norm_image);
 			filters = createFilters(norm_image);
 		}
@@ -105,10 +119,20 @@ std::vector<cv::Mat> NNTrainer::generateFilters(const char* pathToSetOfPics)
 
 	while (images.isOpened())
 	{
-		if (images.read(image))
+		if (images.read(originalImageOfLetter))
 		{
+
+			//////////
+			//test purposes only
+			cv::imwrite("../letterImage.jpg", originalImageOfLetter);
+			//////////
+
 			numberOfImages++;
-			resize(image, norm_image, cv::Size(norm_sizeX, norm_sizeY));
+			cv::Mat whiteBackground(originalImageOfLetter.rows, originalImageOfLetter.cols + 3, CV_8UC3, cv::Scalar(255, 255, 255));
+			originalImageOfLetter.copyTo(whiteBackground(cv::Rect((whiteBackground.cols - originalImageOfLetter.cols)
+				/ 2, (whiteBackground.rows - originalImageOfLetter.rows) / 2, originalImageOfLetter.cols, originalImageOfLetter.rows)));
+
+			resize(whiteBackground, norm_image, cv::Size(norm_sizeX, norm_sizeY));
 			modifyFilters(norm_image, filters);
 		}
 		else
