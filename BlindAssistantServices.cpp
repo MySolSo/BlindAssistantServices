@@ -7,6 +7,7 @@
 #include "NNLetterRecognition.h"
 #include <iostream>
 #include "NNTrainer.h"
+#include <opencv2/videostab/ring_buffer.hpp>
 
 int main()
 {
@@ -51,60 +52,78 @@ int main()
 	// Train that buffalo
 
 	NNTrainer trainer;
+	////////////////
 
+	std::vector<std::string> letters = { "d", "p", "b", "h" };
+		//"a","b","c","d","e","f","g","h"//,"i","j"
+		//,"k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z" };
+
+	std::string path = "C:/Users/gyula/source/repos/BlindAssistantServices/BlindAssistantServices/training/upper/" ;
+	std::string extension = ".jpg";
+	
 	//trainer.initFilterTablesGenerateFile("filters.txt");															   //  delete to add another filter set
-	//trainer.startGeneratingFilters("letter.jpg");                                                                      // generate filters
-	//trainer.startGeneratingFilters("letterD.jpg");
-	//trainer.startGeneratingFilters("letterI.jpg");
-
-	std::vector<std::string> letters = { "A","B","C" };
-
-	std::string path = "./training/lower/";
-	std::string extension = ".gif";
-	/*
-	for (auto letter : letters) {
-		for (auto i = 0; i < 200; ++i) {
-			system("cls");
-			std::cout << letter << " => " << (100 * (i + 1)) / 200 << "%";
-			trainer.startGeneratingFilters((path + letter + "/" + std::to_string(i) + extension).c_str());
-		}
-	}*/
+	//for (auto letter : letters) {
+	//		trainer.startGeneratingFilters((path + letter + "/" + 
+	//			//std::to_string(i) 
+	//			"%1d"
+	//			+ extension
+	//			).c_str());
+	//}
 
 	NNLetterRecognition getAvtivationTablesFromGeneratedFilters("filters.txt", "activationTables.txt");
 
 
-	//for(auto i = 0; i < 200; ++i)
-	{
-		std::vector<std::vector<double>> bigIDK;
-		bigIDK.push_back(getAvtivationTablesFromGeneratedFilters.generateFirstLayerOutpuToActivationVector(preprocessedLines[23]));
+	/////////////////
+	//
+	extension = ".gif";
+	
+	//trainer.initActivationTablesGenerateFile("activationTables.txt");
+	//std::vector<std::vector<double>> bigIDK;
 
-		trainer.initActivationTablesGenerateFile("activationTables.txt");                                                  //  delete to add another activity table
-		auto cindarella = trainer.generatingFunctionActivationVector(bigIDK, 'a', "activationTables.txt");                 //  generate activation tables
-		cv::imshow("current window", preprocessedLines[0]);
-		cvWaitKey(0);
+	//for (auto letter : letters) {
+	//	bigIDK.clear();
+	//	for (auto i = 0; i < 200; ++i) {
 
+	//		system("cls");
+	//		std::cout << letter << " activation table" << " => " << (100 * (i + 1)) / 200 << "%";
 
-	}
+	//		cv::VideoCapture imagesForSablonTraining((path + letter + "/" + std::to_string(i) + extension).c_str());
+	//		cv::Mat test2;
+	//		imagesForSablonTraining.read(test2);
+	//		assert(test2.data);
 
-	{
+	//		bigIDK.push_back(getAvtivationTablesFromGeneratedFilters.generateFirstLayerOutpuToActivationVector(test2));
 
+	//		//cv::imshow("asdasd", test2);
+	//		//cvWaitKey(0);
+	//	}
+	//	auto cindarella = trainer.generatingFunctionActivationVector(bigIDK, letter.c_str(), "activationTables.txt");                 //  generate activation tables
+	//}
+	
 
-		std::vector<std::vector<double>> bigIDK;
-		bigIDK.push_back(getAvtivationTablesFromGeneratedFilters.generateFirstLayerOutpuToActivationVector(preprocessedLines[26]));
+	/////////////////
 
-		auto cindarella = trainer.generatingFunctionActivationVector(bigIDK, 'c', "activationTables.txt");                 //  generate activation tables
-		cv::imshow("current window", preprocessedLines[0]);
-		cvWaitKey(0);
-	}
 
 	std::cout << "-----------------------" << std::endl;
 
-
+	extension = ".gif";
 
 	NNLetterRecognition recognizerizator("filters.txt", "activationTables.txt");
-	std::cout << recognizerizator.recognizeThisNigga(preprocessedLines[0]) << std::endl;
-	std::cout << recognizerizator.recognizeThisNigga(preprocessedLines[26]) << std::endl;
-	std::cout << recognizerizator.recognizeThisNigga(preprocessedLines[23]) << std::endl;
+	//std::cout << recognizerizator.recognizeThisNigga(preprocessedLines[0]) << std::endl;
+
+	for (auto letter : letters) {
+		for (auto i = 0; i < 10; ++i) {
+			cv::VideoCapture imagesForSablonTraining((path + letter + "/" + std::to_string(i) + extension).c_str());
+			cv::Mat test21;
+			imagesForSablonTraining.read(test21);
+
+			cv::imshow("asd", test21);
+			cvWaitKey(0);
+
+
+			std::cout << recognizerizator.recognizeThisNigga(test21) << std::endl;
+		}
+	}
 
 	return 0;
 }

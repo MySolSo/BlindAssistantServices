@@ -26,7 +26,7 @@ double NNLetterRecognition::getCurrentPixelRaport(double imagePixel, double filt
 	}
 
 	//              1- for you know it
-	double difference = 1 - (biggerOne - smallerOne);
+	double difference = 1 - ((biggerOne - smallerOne));
 
 	//if (imagePixel > filterPixel)
 	//{
@@ -76,7 +76,7 @@ int NNLetterRecognition::getIndexOfMaximum(std::vector<double> probabilityes)
 
 NNLetterRecognition::NNLetterRecognition(const char* nameOfTraininedFilters, const char* nameOfTrainedAvtivationTables)
 {
-
+	
 	std::ifstream trainingData(nameOfTraininedFilters);
 
 	char bufferForIdentifier[20];
@@ -90,7 +90,7 @@ NNLetterRecognition::NNLetterRecognition(const char* nameOfTraininedFilters, con
 	}
 	else
 	{
-		std::cout << "Yo nigga training code has identifier problems at" << bufferForIdentifier;
+		std::cout << "Yo nigga training code haves identifier problems at" << bufferForIdentifier;
 	}
 
 	trainingData >> bufferForIdentifier;
@@ -129,7 +129,7 @@ NNLetterRecognition::NNLetterRecognition(const char* nameOfTraininedFilters, con
 	else
 	{
 		//throw bufferForIdentifier;
-		std::cout << "Yo nigga training code has identifier problems." << bufferForIdentifier;
+		std::cout << "Yo nigga training code haves identifier problems." << bufferForIdentifier;
 	}
 
 	trainingData >> bufferForIdentifier;
@@ -142,7 +142,7 @@ NNLetterRecognition::NNLetterRecognition(const char* nameOfTraininedFilters, con
 	else
 	{
 		//throw bufferForIdentifier;
-		std::cout << "Yo nigga training code has identifier problems." << bufferForIdentifier;
+		std::cout << "Yo nigga training code haves identifier problems." << bufferForIdentifier;
 	}
 
 	std::vector<int> sablon;
@@ -155,7 +155,7 @@ NNLetterRecognition::NNLetterRecognition(const char* nameOfTraininedFilters, con
 	while (std::strcmp(bufferForIdentifier, "<sablon>") == 0) {
 		trainingData >> letterIdentifyer;
 		_sablonIdentifyer.push_back(letterIdentifyer);
-
+		
 		int bufferValue;
 		for (auto i = 0; i < sizeOfSablon; ++i)
 		{
@@ -207,7 +207,7 @@ std::vector<std::vector<double>> NNLetterRecognition::convertMatToRatios(const c
 std::vector<std::vector<double>> NNLetterRecognition::generateRatioVectorFromMat(cv::Mat letterImage)
 {
 	cv::imshow("asd", letterImage);
-	cvWaitKey(0);
+	//cvWaitKey(0);
 
 	std::vector<std::vector<double>> transformedImage(letterImage.rows);
 
@@ -216,7 +216,8 @@ std::vector<std::vector<double>> NNLetterRecognition::generateRatioVectorFromMat
 		for (int jMat = 0; jMat < letterImage.cols; ++jMat)
 		{
 			auto colors = letterImage.at<cv::Vec3b>(iMat, jMat);
-			transformedImage[iMat].push_back(1 - ((colors[0] + colors[1] + colors[2]) / 3) / 255.0);
+			//                               add 1 -
+			transformedImage[iMat].push_back(  ((colors[0] + colors[1] + colors[2]) / 3) / 255.0);
 		}
 	}
 	return transformedImage;

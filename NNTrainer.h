@@ -9,9 +9,9 @@ namespace cv {
 class NNTrainer
 {
 private:
-	const int step = 5;
-	const int filterRows = 5;
-	const int filterCols = 5;
+	const int step = 3;             /////      needs to be >= as filter rows and colls
+	const int filterRows = 3;       ////    TODO: fix => needs to be equal or sablons wont work
+	const int filterCols = 3;
 
 	int norm_sizeX = 15;
 	int norm_sizeY = 15;
@@ -30,8 +30,8 @@ public:
 	~NNTrainer();
 
 	void startGeneratingFilters(const char* pathToSetOfPics);
-	std::vector<int> generatingFunctionActivationVector(const std::vector<std::vector<double>>& activationOfFilters, const char itIsThisLetter, const char* nameOfOutput);
-	void createTemplates(std::unordered_map<char, std::vector<int>> templates, const char letterTested, const std::vector<std::vector<double>>& activationOfFilters, const char* nameOfOutput);
+	std::vector<int> generatingFunctionActivationVector(const std::vector<std::vector<double>>& activationOfFilters, const char* itIsThisLetter, const char* nameOfOutput);
+	void createTemplates(std::unordered_map<char, std::vector<int>> templates, const char* letterTested, const std::vector<std::vector<double>>& activationOfFilters, const char* nameOfOutput);
 	void initActivationTablesGenerateFile(const char* nameOfFile);
 	void initFilterTablesGenerateFile(const char* nameOfFile);
 };
