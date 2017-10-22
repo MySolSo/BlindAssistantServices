@@ -8,6 +8,7 @@
 #include <opencv2/core/mat.hpp>
 #include <opencv2/videostab/ring_buffer.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include "NNLayer.h"
 
 double NNLetterRecognition::getCurrentPixelRaport(double imagePixel, double filterPixel)
 {
@@ -76,7 +77,7 @@ int NNLetterRecognition::getIndexOfMaximum(std::vector<double> probabilityes)
 
 NNLetterRecognition::NNLetterRecognition(const char* nameOfTraininedFilters, const char* nameOfTrainedAvtivationTables)
 {
-	
+
 	std::ifstream trainingData(nameOfTraininedFilters);
 
 	char bufferForIdentifier[20];
@@ -155,7 +156,7 @@ NNLetterRecognition::NNLetterRecognition(const char* nameOfTraininedFilters, con
 	while (std::strcmp(bufferForIdentifier, "<sablon>") == 0) {
 		trainingData >> letterIdentifyer;
 		_sablonIdentifyer.push_back(letterIdentifyer);
-		
+
 		int bufferValue;
 		for (auto i = 0; i < sizeOfSablon; ++i)
 		{
@@ -190,13 +191,13 @@ std::vector<std::vector<double>> NNLetterRecognition::convertMatToRatios(const c
 {
 	std::vector<std::vector<double>> convertedImage(letterImage.rows);
 
-	for(int iteratorX = 0; iteratorX < letterImage.rows; ++iteratorX)
+	for (int iteratorX = 0; iteratorX < letterImage.rows; ++iteratorX)
 	{
 		for (int iteratorY = 0; iteratorY < letterImage.cols; ++iteratorY)
 		{
 			auto valuesOfSelectedPosition = letterImage.at<cv::Vec3d>(cv::Point(iteratorX, iteratorY));
 			double valueInGrey = (valuesOfSelectedPosition[0] + valuesOfSelectedPosition[1] + valuesOfSelectedPosition[2]) / 3;
-			double valueInRatio = 1 - (valueInGrey/255);
+			double valueInRatio = 1 - (valueInGrey / 255);
 
 			convertedImage[iteratorX].push_back(valueInRatio);
 		}
@@ -217,7 +218,7 @@ std::vector<std::vector<double>> NNLetterRecognition::generateRatioVectorFromMat
 		{
 			auto colors = letterImage.at<cv::Vec3b>(iMat, jMat);
 			//                               add 1 -
-			transformedImage[iMat].push_back(  ((colors[0] + colors[1] + colors[2]) / 3) / 255.0);
+			transformedImage[iMat].push_back(((colors[0] + colors[1] + colors[2]) / 3) / 255.0);
 		}
 	}
 	return transformedImage;
@@ -247,7 +248,7 @@ std::vector<double> NNLetterRecognition::generateFirstLayerOutpuToActivationVect
 						//std::cout << pixelRatios[pixelRatios.size() - 1] << "   " ;
 					}
 				}
-					NNactivities.push_back(calculateFilterRatioAKANeuronActivity(pixelRatios));
+				NNactivities.push_back(calculateFilterRatioAKANeuronActivity(pixelRatios));
 				// cout 
 					//std::cout << "|" <<  calculateFilterRatioAKANeuronActivity(pixelRatios) << std::endl;
 			}
@@ -258,21 +259,39 @@ std::vector<double> NNLetterRecognition::generateFirstLayerOutpuToActivationVect
 	return NNactivities;
 }
 
+std::vector<double> NNLetterRecognition::generateFirstLayerOutpuToActivationVector(std::vector<double> letter)
+{
+	std::vector<double> NNactivities;
+	std::vector<double> pixelRatios;
+
+	for (auto filter : _filters) {
+		pixelRatios.clear();
+		for (int letterIterator = 0; letterIterator < letter.size() - _filterY - _stepSize + 1; letterIterator += _stepSize)
+		{
+			for (int filterIterator = 0; filterIterator < _filterY; filterIterator++)
+				pixelRatios.push_back(getCurrentPixelRaport(letter[letterIterator + filterIterator], filter[0][filterIterator]));
+		}
+		NNactivities.push_back(calculateFilterRatioAKANeuronActivity(pixelRatios));
+	}
+
+	return NNactivities;
+}
+
 char NNLetterRecognition::recognizeThisNigga(cv::Mat letter)
 {
 	auto activationTable = generateFirstLayerOutpuToActivationVector(letter);
 
 	std::vector<double> probabilityes;
-	for(auto sablon : _sablons)
+	for (auto sablon : _sablons)
 	{
 		probabilityes.push_back(rezultatSablon(activationTable, sablon));
 	}
 
-	for(auto prob : probabilityes)
+	for (auto prob : probabilityes)
 	{
 		std::cout << prob << " ";
 	}
-	std::cout<< "----"<<probabilityes[getIndexOfMaximum(probabilityes)]<<std::endl;
+	std::cout << "----" << probabilityes[getIndexOfMaximum(probabilityes)] << std::endl;
 
 	return _sablonIdentifyer[getIndexOfMaximum(probabilityes)];
 }

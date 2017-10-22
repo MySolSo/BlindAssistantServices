@@ -8,6 +8,7 @@
 #include <iostream>
 #include "NNTrainer.h"
 #include <opencv2/videostab/ring_buffer.hpp>
+#include "NNLayer.h"
 
 int main()
 {
@@ -54,21 +55,21 @@ int main()
 	NNTrainer trainer;
 	////////////////
 
-	std::vector<std::string> letters = { "d", "p", "b", "h" };
-		//"a","b","c","d","e","f","g","h"//,"i","j"
-		//,"k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z" };
+	std::vector<std::string> letters = { //"d", "p", "b", "h" };
+	"a","b","c","d","e","f","g","h"//,"i","j"
+	,"k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z" };
 
-	std::string path = "C:/Users/gyula/source/repos/BlindAssistantServices/BlindAssistantServices/training/upper/" ;
+	std::string path = "C:/Users/gyula/source/repos/BlindAssistantServices/BlindAssistantServices/training/upper/";
 	std::string extension = ".jpg";
-	
-	//trainer.initFilterTablesGenerateFile("filters.txt");															   //  delete to add another filter set
-	//for (auto letter : letters) {
-	//		trainer.startGeneratingFilters((path + letter + "/" + 
-	//			//std::to_string(i) 
-	//			"%1d"
-	//			+ extension
-	//			).c_str());
-	//}
+
+	trainer.initFilterTablesGenerateFile("filters.txt");															   //  delete to add another filter set
+	for (auto letter : letters) {
+			trainer.startGeneratingFilters((path + letter + "/" + 
+				//std::to_string(i) 
+				"%1d"
+				+ extension
+				).c_str());
+	}
 
 	NNLetterRecognition getAvtivationTablesFromGeneratedFilters("filters.txt", "activationTables.txt");
 
@@ -76,30 +77,56 @@ int main()
 	/////////////////
 	//
 	extension = ".gif";
-	
-	//trainer.initActivationTablesGenerateFile("activationTables.txt");
-	//std::vector<std::vector<double>> bigIDK;
 
-	//for (auto letter : letters) {
-	//	bigIDK.clear();
-	//	for (auto i = 0; i < 200; ++i) {
+	//trainer.initFilterTablesGenerateFile("filtersLayer1.txt", 1, 150);
+	//trainer.initFilterTablesGenerateFile("filtersLayer2.txt", 3, 3);
+	//trainer.initFilterTablesGenerateFile("filtersLayer3.txt", 1, 1);
 
-	//		system("cls");
-	//		std::cout << letter << " activation table" << " => " << (100 * (i + 1)) / 200 << "%";
+	trainer.initActivationTablesGenerateFile("activationTables.txt");
 
-	//		cv::VideoCapture imagesForSablonTraining((path + letter + "/" + std::to_string(i) + extension).c_str());
-	//		cv::Mat test2;
-	//		imagesForSablonTraining.read(test2);
-	//		assert(test2.data);
+	std::vector<std::vector<double>> bigIDK;
+	std::vector<std::vector<double>> biggestIDK;
 
-	//		bigIDK.push_back(getAvtivationTablesFromGeneratedFilters.generateFirstLayerOutpuToActivationVector(test2));
+	for (auto letter : letters) {
+		bigIDK.clear();
+		for (auto i = 0; i < 200; ++i) {
 
-	//		//cv::imshow("asdasd", test2);
-	//		//cvWaitKey(0);
-	//	}
-	//	auto cindarella = trainer.generatingFunctionActivationVector(bigIDK, letter.c_str(), "activationTables.txt");                 //  generate activation tables
-	//}
-	
+			system("cls");
+			std::cout << letter << " activation table" << " => " << (100 * (i + 1)) / 200 << "%";
+
+			cv::VideoCapture imagesForSablonTraining((path + letter + "/" + std::to_string(i) + extension).c_str());
+			cv::Mat test2;
+			imagesForSablonTraining.read(test2);
+			assert(test2.data);
+
+			bigIDK.push_back(getAvtivationTablesFromGeneratedFilters.generateFirstLayerOutpuToActivationVector(test2));
+
+			//cv::imshow("asdasd", test2);
+			//cvWaitKey(0);
+		}
+
+	//	// one layer of data
+
+	//	//NNLayer layer;
+
+	//	//layer.startGeneratingFiltersFromLayerData(bigIDK,"filtersLayer1.txt", 150);
+	//	////auto Layer2InputToNN = layer.convertLayerOutputToMat(bigIDK,50,  50);
+
+	//	//NNLetterRecognition recognizeSecondLayer("filtersLayer1.txt", "activationTables.txt");
+
+	//	//biggestIDK.clear();
+	//	//for (auto i = 0; i < 20; ++i)
+	//	//{
+	//	//	biggestIDK.push_back(
+	//	//	recognizeSecondLayer.generateFirstLayerOutpuToActivationVector(bigIDK[i])
+	//	//	);
+	//	//}
+	//	
+	//	// replace to biggestIDK
+
+		auto cindarella = trainer.generatingFunctionActivationVector(bigIDK, letter.c_str(), "activationTables.txt");                 //  generate activation tables
+	}
+
 
 	/////////////////
 
@@ -111,6 +138,8 @@ int main()
 	NNLetterRecognition recognizerizator("filters.txt", "activationTables.txt");
 	//std::cout << recognizerizator.recognizeThisNigga(preprocessedLines[0]) << std::endl;
 
+	int pro = 0,contra=0;
+
 	for (auto letter : letters) {
 		for (auto i = 0; i < 10; ++i) {
 			cv::VideoCapture imagesForSablonTraining((path + letter + "/" + std::to_string(i) + extension).c_str());
@@ -118,12 +147,30 @@ int main()
 			imagesForSablonTraining.read(test21);
 
 			cv::imshow("asd", test21);
-			cvWaitKey(0);
+			//cvWaitKey(1);
 
+			char result = recognizerizator.recognizeThisNigga(test21);
 
-			std::cout << recognizerizator.recognizeThisNigga(test21) << std::endl;
+			char* asd = new char[1];
+
+			*asd = result;
+
+			std::cout << letter.c_str() << "-";
+
+			if(strcmp(letter.c_str(), asd) == 0)
+			{
+				pro++;
+			}
+			else
+			{
+				contra++;
+			}
+			delete asd;
+			std::cout << result << std::endl;
 		}
 	}
+
+	std::cout << "---   " << pro << " ---- " << contra << std::endl;
 
 	return 0;
 }

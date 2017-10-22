@@ -13,8 +13,8 @@ private:
 	const int filterRows = 3;       ////    TODO: fix => needs to be equal or sablons wont work
 	const int filterCols = 3;
 
-	int norm_sizeX = 15;
-	int norm_sizeY = 15;
+	int norm_sizeX = 18;
+	int norm_sizeY = 18;
 
 	double numberOfImages = 0;
 
@@ -34,5 +34,6 @@ public:
 	void createTemplates(std::unordered_map<char, std::vector<int>> templates, const char* letterTested, const std::vector<std::vector<double>>& activationOfFilters, const char* nameOfOutput);
 	void initActivationTablesGenerateFile(const char* nameOfFile);
 	void initFilterTablesGenerateFile(const char* nameOfFile);
+	void initFilterTablesGenerateFile(const char* nameOfFile, int length, int height);
 };
 
