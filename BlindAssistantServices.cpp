@@ -9,10 +9,11 @@
 #include "NNTrainer.h"
 #include <opencv2/videostab/ring_buffer.hpp>
 #include "NNLayer.h"
+#include "transformImageToDataSet.h"
 
 int main()
 {
-	const cv::String name_of_files = "test.jpg";
+	const cv::String name_of_files = "test.png";
 
 	const auto image = cv::imread(name_of_files, CV_LOAD_IMAGE_COLOR);
 	assert(image.data);
@@ -21,22 +22,41 @@ int main()
 
 	ImagePreprocessor preprocessor(image);
 
-
 	//auto corners = preprocessor.getRelativeCornersFromImage();
 	//auto corneredImage = preprocessor.perspectiveCorrection(copyOfImage, corners);
 	//
-	auto preprocessedLines = preprocessor.getColorRefinedImageInLines(image);//corneredImage);
 	//
-	/*ParseLetters parser(image);
+
+	std::vector<cv::Mat> toProcess;
+
+	toProcess.push_back(image);
+
+	ParseLetters parser(image);
 	int blackLimit = parser.getAverageBlackValue();
-	auto lineLetters = parser.getVectorOfLettersFromLine(preprocessedLines,blackLimit);
-*/
-/*for(auto letter : preprocessedLines)
+	auto lineLetters = parser.getVectorOfLettersFromLine(toProcess,100);
+
+	/*for (auto letter : lineLetters)
+	{
+		cv::destroyWindow("BlackNiggaWindowForYouFella");
+		cv::imshow("BlackNiggaWindowForYouFella", letter);
+		cvWaitKey(0);
+	}*/
+
+     	auto preprocessedLines = preprocessor.getColorRefinedImageInLines(lineLetters[2]);//corneredImage);
+
+for(auto letter : preprocessedLines)
 {
 	cv::destroyWindow("BlackNiggaWindowForYouFella");
 	cv::imshow("BlackNiggaWindowForYouFella", letter);
-	cvWaitKey(0);
-}*/
+	cvWaitKey(0); 
+}
+
+
+	transformImageToDataSet transformer;
+
+	auto data = transformer.adaptingImageToDataset(preprocessedLines[1]);
+
+
 
 	std::cout << "--------------------------------------" << std::endl;
 
@@ -62,14 +82,14 @@ int main()
 	std::string path = "C:/Users/gyula/source/repos/BlindAssistantServices/BlindAssistantServices/training/upper/";
 	std::string extension = ".jpg";
 
-	trainer.initFilterTablesGenerateFile("filters.txt");															   //  delete to add another filter set
-	for (auto letter : letters) {
-			trainer.startGeneratingFilters((path + letter + "/" + 
-				//std::to_string(i) 
-				"%1d"
-				+ extension
-				).c_str());
-	}
+	//trainer.initFilterTablesGenerateFile("filters.txt");															   //  delete to add another filter set
+	//for (auto letter : letters) {
+	//		trainer.startGeneratingFilters((path + letter + "/" + 
+	//			//std::to_string(i) 
+	//			"%1d"
+	//			+ extension
+	//			).c_str());
+	//}
 
 	NNLetterRecognition getAvtivationTablesFromGeneratedFilters("filters.txt", "activationTables.txt");
 
@@ -82,50 +102,50 @@ int main()
 	//trainer.initFilterTablesGenerateFile("filtersLayer2.txt", 3, 3);
 	//trainer.initFilterTablesGenerateFile("filtersLayer3.txt", 1, 1);
 
-	trainer.initActivationTablesGenerateFile("activationTables.txt");
+	//trainer.initActivationTablesGenerateFile("activationTables.txt");
 
-	std::vector<std::vector<double>> bigIDK;
-	std::vector<std::vector<double>> biggestIDK;
+	//std::vector<std::vector<double>> bigIDK;
+	//std::vector<std::vector<double>> biggestIDK;
 
-	for (auto letter : letters) {
-		bigIDK.clear();
-		for (auto i = 0; i < 200; ++i) {
+	//for (auto letter : letters) {
+	//	bigIDK.clear();
+	//	for (auto i = 0; i < 10; ++i) {
 
-			system("cls");
-			std::cout << letter << " activation table" << " => " << (100 * (i + 1)) / 200 << "%";
+	//		system("cls");
+	//		std::cout << letter << " activation table" << " => " << (100 * (i + 1)) / 200 << "%";
 
-			cv::VideoCapture imagesForSablonTraining((path + letter + "/" + std::to_string(i) + extension).c_str());
-			cv::Mat test2;
-			imagesForSablonTraining.read(test2);
-			assert(test2.data);
+	//		cv::VideoCapture imagesForSablonTraining((path + letter + "/" + std::to_string(i) + extension).c_str());
+	//		cv::Mat test2;
+	//		imagesForSablonTraining.read(test2);
+	//		assert(test2.data);
 
-			bigIDK.push_back(getAvtivationTablesFromGeneratedFilters.generateFirstLayerOutpuToActivationVector(test2));
+	//		bigIDK.push_back(getAvtivationTablesFromGeneratedFilters.generateFirstLayerOutpuToActivationVector(test2));
 
-			//cv::imshow("asdasd", test2);
-			//cvWaitKey(0);
-		}
+	//		//cv::imshow("asdasd", test2);
+	//		//cvWaitKey(0);
+	//	}
 
 	//	// one layer of data
 
-	//	//NNLayer layer;
+		//NNLayer layer;
 
-	//	//layer.startGeneratingFiltersFromLayerData(bigIDK,"filtersLayer1.txt", 150);
-	//	////auto Layer2InputToNN = layer.convertLayerOutputToMat(bigIDK,50,  50);
+		//layer.startGeneratingFiltersFromLayerData(bigIDK,"filtersLayer1.txt", 150);
+		////auto Layer2InputToNN = layer.convertLayerOutputToMat(bigIDK,50,  50);
 
-	//	//NNLetterRecognition recognizeSecondLayer("filtersLayer1.txt", "activationTables.txt");
+		//NNLetterRecognition recognizeSecondLayer("filtersLayer1.txt", "activationTables.txt");
 
-	//	//biggestIDK.clear();
-	//	//for (auto i = 0; i < 20; ++i)
-	//	//{
-	//	//	biggestIDK.push_back(
-	//	//	recognizeSecondLayer.generateFirstLayerOutpuToActivationVector(bigIDK[i])
-	//	//	);
-	//	//}
-	//	
+		//biggestIDK.clear();
+		//for (auto i = 0; i < 10; ++i)
+		//{
+		//	biggestIDK.push_back(
+		//	recognizeSecondLayer.generateFirstLayerOutpuToActivationVector(bigIDK[i])
+		//	);
+		//}
+		//
 	//	// replace to biggestIDK
 
-		auto cindarella = trainer.generatingFunctionActivationVector(bigIDK, letter.c_str(), "activationTables.txt");                 //  generate activation tables
-	}
+	//	auto cindarella = trainer.generatingFunctionActivationVector(bigIDK, letter.c_str(), "activationTables.txt");                 //  generate activation tables
+	//}
 
 
 	/////////////////

@@ -276,7 +276,15 @@ std::vector<double> NNLetterRecognition::generateFirstLayerOutpuToActivationVect
 
 	return NNactivities;
 }
-
+//std::vector<double> NNLetterRecognition::summUpPerPositionAndDivide(std::vector<std::vector<double>> layerData)
+//{
+//	std::vector<doubel>
+//	for(auto subActivations : layerData)
+//	for(int i = 0; i< subActivations.size(); ++i)
+//	{
+//		layer
+//	}
+//}
 char NNLetterRecognition::recognizeThisNigga(cv::Mat letter)
 {
 	auto activationTable = generateFirstLayerOutpuToActivationVector(letter);
