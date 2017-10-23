@@ -68,7 +68,7 @@ int main()
 			std::cout << letter << " => " << (100 * (i + 1)) / 200 << "%";
 			trainer.startGeneratingFilters((path + letter + "/" + std::to_string(i) + extension).c_str());
 		}
-	}
+	}	
 
 	NNLetterRecognition getAvtivationTablesFromGeneratedFilters("filters.txt", "activationTables.txt");
 
