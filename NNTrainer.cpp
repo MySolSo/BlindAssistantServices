@@ -27,7 +27,7 @@ void NNTrainer::writeFilter(cv::Mat filter)
 	{
 		for (int jFilter = 0; jFilter < filter.cols; jFilter++)
 		{
-			fout << filter.at<double>(iFilter, jFilter) << ' ';
+			fout << filter.at<double>(iFilter, jFilter)/numberOfImages << ' ';
 		}
 		fout << std::endl;
 	}
@@ -52,6 +52,7 @@ std::vector<cv::Mat> NNTrainer::createFilters(cv::Mat image)
 				for (int jFilter = 0; jFilter < filter.cols; jFilter++)
 				{
 					//          add 1 - etc for images with white background 
+
 					filter.at<double>(iFilter, jFilter) = (image.at<double>(iFilter + iMat, jFilter + jMat) / 255.0);
 				}
 			}
@@ -92,6 +93,7 @@ std::vector<cv::Mat> NNTrainer::generateFilters(const char* pathToSetOfPics)
 	cv::Mat originalImageOfLetter, norm_image(norm_sizeX, norm_sizeY, CV_64F);
 	//cv::resize(image, norm_image, cv::Size(norm_sizeX, norm_sizeY));
 	//cvWaitKey(0);
+	images.read(image);
 	if (images.isOpened())
 	{
 		if (images.read(originalImageOfLetter))
@@ -139,6 +141,9 @@ std::vector<cv::Mat> NNTrainer::generateFilters(const char* pathToSetOfPics)
 			images.release();
 	}
 
+	for (auto filter : filters)
+		writeFilter(filter);
+
 	return filters;
 }
 
@@ -158,14 +163,14 @@ void NNTrainer::startGeneratingFilters(const char* pathToSetOfPics)
 			for (int j = 0; j < img.cols; j++)
 				img.at<double>(k, j) /= numberOfImages;
 		//imshow("brack", img);
-		writeFilter(img);
+
 		//cv::waitKey(0);
 		//nr = i;
 	}
 	//std::cout << std::endl << nr << std::endl;
 }
 
-std::vector<int> NNTrainer::generatingFunctionActivationVector(const std::vector<std::vector<double>>& activationOfFilters,const char itIsThisLetter, const char* nameOfOutput)
+std::vector<int> NNTrainer::generatingFunctionActivationVector(const std::vector<std::vector<double>>& activationOfFilters, const char* itIsThisLetter, const char* nameOfOutput)
 {
 	fout.close();
 	fout.open(nameOfOutput, std::fstream::in | std::fstream::out | std::fstream::app);
@@ -202,9 +207,10 @@ std::vector<int> NNTrainer::generatingFunctionActivationVector(const std::vector
 	return generatedTemplate;
 }
 
-void NNTrainer::createTemplates(std::unordered_map<char, std::vector<int>> templates, const char letterTested, const std::vector<std::vector<double>>& activationOfFilters, const char* nameOfOutput)
+void NNTrainer::createTemplates(std::unordered_map<char, std::vector<int>> templates, const char* letterTested, const std::vector<std::vector<double>>& activationOfFilters, const char* nameOfOutput)
 {
-	templates.emplace(letterTested, generatingFunctionActivationVector(activationOfFilters, letterTested, nameOfOutput)); //the implementation for the function can be changed eventually
+
+	//templates.emplace(letterTested, generatingFunctionActivationVector(activationOfFilters, letterTested, nameOfOutput)); //the implementation for the function can be changed eventually
 }
 
 void NNTrainer::initActivationTablesGenerateFile(const char* nameOfFile)
@@ -228,6 +234,17 @@ void NNTrainer::initFilterTablesGenerateFile(const char* nameOfFile)
 	fileOut << "<dimensionsFilter>" << std::endl;
 	fileOut << filterRows << " " << filterCols << std::endl;
 	fileOut << "</dimensionsFilter>" << std::endl;
-	
+
+	fileOut.close();
+}
+
+void NNTrainer::initFilterTablesGenerateFile(const char* nameOfFile, int length, int height)
+{
+	std::fstream fileOut(nameOfFile, std::fstream::out);
+
+	fileOut << "<dimensionsFilter>" << std::endl;
+	fileOut << length << " " << height << std::endl;
+	fileOut << "</dimensionsFilter>" << std::endl;
+
 	fileOut.close();
 }

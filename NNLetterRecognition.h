@@ -30,6 +30,7 @@ public:
 	NNLetterRecognition(const char* nameOfTrainingResultFile, const char* nameOfTraininedActivationTables);
 	~NNLetterRecognition();
 
+	std::vector<double> NNLetterRecognition::generateFirstLayerOutpuToActivationVector(std::vector<double> letter);
 	std::vector<double> generateFirstLayerOutpuToActivationVector(cv::Mat letter);
 	char recognizeThisNigga(cv::Mat letter);
 };

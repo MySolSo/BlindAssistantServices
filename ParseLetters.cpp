@@ -38,9 +38,10 @@ std::vector<cv::Mat> ParseLetters::getVectorOfLettersFromLine(std::vector<cv::Ma
 	cv::Mat blackAndWhite;
 	cv::transform(_line, blackAndWhite, cv::Matx13f(1, 1, 1));
 
-	cv::imshow("plm", blackAndWhite);
+	cv::imshow("asd", blackAndWhite);
 	cv::waitKey(0);
 	*/
+
 	std::vector<cv::Mat> returnLetters;
 
 	for (auto line : lines) {
@@ -52,14 +53,14 @@ std::vector<cv::Mat> ParseLetters::getVectorOfLettersFromLine(std::vector<cv::Ma
 			isThereTrueBlack = false;
 			for (auto rows = 0; rows < line.rows; ++rows)
 			{
-				color = line.at<cv::Vec3b>(cv::Point(cols, rows));
+				color = line.at<cv::Vec3b>(cv::Point(rows, cols));
 
 				if (static_cast<int>(color[0]) < lowerLimit && static_cast<int>(color[1]) < lowerLimit && static_cast<int>(color[2]) < lowerLimit)
 				{
 					isThereTrueBlack = true;
 				}
 
-				line.at<cv::Vec3b>(cv::Point(cols, rows)) = color;
+				line.at<cv::Vec3b>(cv::Point(rows, cols)) = color;
 			}
 
 			if (!isThereTrueBlack)
@@ -70,16 +71,17 @@ std::vector<cv::Mat> ParseLetters::getVectorOfLettersFromLine(std::vector<cv::Ma
 
 				for (auto rows = 0; rows < line.rows; ++rows)
 				{
-					color = line.at<cv::Vec3b>(cv::Point(cols, rows));
+					color = line.at<cv::Vec3b>(cv::Point(rows, cols));
 
 						color[0] = 0;
 					color[1] = 0;
 					color[2] = 255;
 
-					line.at<cv::Vec3b>(cv::Point(cols, rows)) = color;
+					line.at<cv::Vec3b>(cv::Point(rows, cols)) = color;
 				}
 
 				//
+				
 
 				color[0] = 0;
 				color[1] = 0;
@@ -91,7 +93,7 @@ std::vector<cv::Mat> ParseLetters::getVectorOfLettersFromLine(std::vector<cv::Ma
 
 		//
 
-		cv::imshow("plm", line);
+		cv::imshow("asd", line);
 		cvWaitKey(0);
 
 		//
@@ -101,10 +103,10 @@ std::vector<cv::Mat> ParseLetters::getVectorOfLettersFromLine(std::vector<cv::Ma
 		int startWidth;
 		int endWidth;
 
-		for (auto cols = 0; cols < line.cols; ++cols)
+		for (auto cols = 0; cols < line.rows; ++cols)
 		{
-			color = line.at<cv::Vec3b>(cv::Point(cols, 0));
-			if (color[0] == 0 && color[1] == 0 && color[2] == 255)
+			color = line.at<cv::Vec3b>(cv::Point(1, cols));
+			if (static_cast<int>(color[0]) == 0 && static_cast<int>(color[1]) == 0 && static_cast<int>(color[2]) == 255)
 			{
 				neededPart_curent = false;
 			}
@@ -112,7 +114,7 @@ std::vector<cv::Mat> ParseLetters::getVectorOfLettersFromLine(std::vector<cv::Ma
 			{
 				neededPart_curent = true;
 			}
-
+			std::cout << (static_cast<int>(color[0]) == 0 && static_cast<int>(color[1]) == 0 && static_cast<int>(color[2]) == 255) << std::endl;
 			if (neededPart_curent != neededPart_pervous) {
 				if (neededPart_curent == true)
 				{
@@ -121,7 +123,7 @@ std::vector<cv::Mat> ParseLetters::getVectorOfLettersFromLine(std::vector<cv::Ma
 				else
 				{
 					endWidth = cols;
-					cv::Mat letter = cv::Mat(line, cv::Rect(startWidth, 1, (endWidth - startWidth), line.rows - 1));
+					cv::Mat letter = cv::Mat(line, cv::Rect(1, startWidth, line.cols - 1, (endWidth - startWidth)));
 
 					returnLetters.push_back(letter);
 				}
