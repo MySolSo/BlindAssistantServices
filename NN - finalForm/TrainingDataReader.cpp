@@ -21,10 +21,10 @@ namespace BPN
 	bool TrainingDataReader::ReadData(const int typeOfDataReader)
 	{
 		assert(!m_filename.empty());
-		std::unordered_map<char, std::vector<int>> teacherValues = { { 'A', {0,0,0,0,1} },{ 'B', {0,0,0,1,0} },{ 'C', {0,0,0,1,1} } };/*,{ 'D', {0,0,1,0,0 } },{'E', {0,0,1,0,1}},{'F', {0,0,1,1,0} }, { 'G', {0,0,1,1,1} }, { 'H', {0,1,0,0,0 }} };/* , { 'I', {0,1,0,0,1} },
+		std::unordered_map<char, std::vector<int>> teacherValues = { { 'A', {0,0,0,0,1} },{ 'B', {0,0,0,1,0} },{ 'C', {0,0,0,1,1} },{'D', {0,0,1,0,0 } },{ 'E', {0,0,1,0,1} },{'F', {0,0,1,1,0} }, { 'G', {0,0,1,1,1} }, { 'H', {0,1,0,0,0 }}, { 'I', {0,1,0,0,1} },
 																									  {'J',{0,1,0,1,0}},{'K',{0,1,0,1,1}},{'L',{0,1,1,0,0}},{'M',{0,1,1,0,1}},{'N',{0,1,1,1,0}},{'O',{0,1,1,1,1}},{'P',{1,0,0,0,0}},{'Q',{1,0,0,0,1}},{'R',{1,0,0,1,0}},{'S',{1,0,0,1,1}},{'T',{1,0,1,0,0}},{'U',{1,0,1,0,1}},{'V',{1,0,1,1,0}},{'W',{1,0,1,1,1}},
-																									  {'X',{1,1,0,0,0}},{'Y',{1,1,0,0,1}},{'Z',{1,1,0,1,0}} };*/
-		const int inputNeuronsNumber = 25;
+																									  {'X',{1,1,0,0,0}},{'Y',{1,1,0,0,1}},{'Z',{1,1,0,1,0}} };
+		const int inputNeuronsNumber = 16;
 		if (typeOfDataReader == 1)
 		{
 
@@ -59,7 +59,7 @@ namespace BPN
 						inputFile >> auxiliar;
 						(*Valori_Litera)[i] = (auxiliar);
 					}
-					if (Litera == 'A' || Litera == 'B' || Litera == 'C' || Litera == 'D' || Litera == 'L')
+					if (true/*Litera == 'A' || Litera == 'B' || Litera == 'C' || Litera == 'D' || Litera == 'E'*/)
 					{
 
 						entry->m_inputs = *Valori_Litera;
@@ -128,8 +128,8 @@ namespace BPN
 
 		// Training set is set to 60% out of all data
 		int const numEntries = (int)m_entries.size();
-		int const numTrainingEntries = (int)(0.5 * numEntries);
-		int const numGeneralizationEntries = (int)(ceil(0.25* numEntries));
+		int const numTrainingEntries = (int)(0.6 * numEntries);
+		int const numGeneralizationEntries = (int)(ceil(0.2* numEntries));
 
 		int entryIdx = 0;
 		for (; entryIdx < numTrainingEntries; entryIdx++)

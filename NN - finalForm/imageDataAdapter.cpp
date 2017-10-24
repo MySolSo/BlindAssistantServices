@@ -13,7 +13,7 @@ imageDataAdapter::~imageDataAdapter()
 
 int imageDataAdapter::remapIntValueToUsedFormat(const double input,const int minInRange,const int maxInRange)
 {
-	const int atrMinRange = 0, atrMaxRange = 15;
+	const int atrMinRange = 0, atrMaxRange = 80;
 
 	int result = (input - minInRange)/(maxInRange - minInRange) * (atrMaxRange - atrMinRange) + atrMinRange;
 
@@ -30,18 +30,49 @@ std::vector<double> imageDataAdapter::adaptToHeatMap(const cv::Mat & image)
 	cv::resize(originalImage, resized, size);
 
 	cvtColor(resized, resized, CV_BGR2GRAY);
-	cv::threshold(resized, resized, 100, 255, CV_THRESH_BINARY);
+	
+	//cv::threshold(resized, resized, 100, 255, CV_THRESH_BINARY_INV);
+	
 	std::vector<double> result;
 	double currentValue;
+	double minValue = std::numeric_limits<double>::max();
+	double maxValue = std::numeric_limits<double>::min();
+
+	double normalizedPixelValue, invertedValue;
+	for (auto i = 0; i < size.height; ++i)
+	{
+		for (auto j = 0; j < size.width; ++j)
+		{
+			currentValue = static_cast<int>(resized.at<uchar>(i, j));
+			invertedValue =  255 - currentValue;
+			resized.at<uchar>(i, j) = invertedValue;
+			if (invertedValue < minValue)
+			{
+				minValue = currentValue;
+			}
+			else if (invertedValue > maxValue)
+			{
+				maxValue = currentValue;
+			}
+		}
+	}
+	/*cv::imshow("display", resized);
+	cv::waitKey(0);*/
+	double finalValue;
 	for (auto i = 0; i < size.height; ++i)
 	{
 		for (auto j = 0; j < size.width; ++j)
 		{
 			currentValue = static_cast<double>(resized.at<uchar>(i, j));
-			if (currentValue < 100)
+			//invertedValue = 255 - currentValue;
+			/*if (currentValue < 100)
 				result.push_back(0);
 			else
-				result.push_back(1);
+				result.push_back(1);*/
+			normalizedPixelValue = (currentValue - minValue) / (maxValue - minValue);
+			finalValue = (255 * normalizedPixelValue) + 0;
+			result.push_back(finalValue);
+			
 		}
 	}
 	

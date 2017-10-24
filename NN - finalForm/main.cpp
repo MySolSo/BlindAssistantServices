@@ -42,14 +42,14 @@ int main()
 
 	
 
-	int numInputs = 25;
+	int numInputs = 16;
 	//numOutputs -> binary representation of the letterIndex
 	int numOutputs = 5;
-	int numHidden = 50;
+	int numHidden = 38;
 
 	/////////PHOTOS dataReader(0) / 16-ATR dataReader(1)
 	BPN::TrainingDataReader dataReader(trainingDataPath, numInputs, numOutputs);
-	if (!dataReader.ReadData(0))
+	if (!dataReader.ReadData(1))
 	{
 		return 1;
 	}
@@ -60,9 +60,9 @@ int main()
 
 	//// Create the neural network trainer
 	BPN::NetworkTrainer::Settings trainerSettings;
-	trainerSettings.m_learningRate = 0.04;
-	trainerSettings.m_momentum = 0.015;
-	trainerSettings.m_maxEpochs = 10000;
+	trainerSettings.m_learningRate = 0.08;
+	trainerSettings.m_momentum = 0.68;
+	trainerSettings.m_maxEpochs = 20000;
 	trainerSettings.m_desiredAccuracy = 90;
 
 	//How to train your dragon
@@ -92,8 +92,13 @@ int main()
 	solutions.push_back(letterD1);
 	solutions.push_back(letterD2);
 
+	cv::VideoCapture images("./training/upper/H/124.gif");
+	cv::Mat image;
+	images.read(image);
 
-	auto image = cv::imread("blackA.jpg", CV_LOAD_IMAGE_COLOR);
+	image = cv::imread("blackD.jpg", CV_LOAD_IMAGE_COLOR);
+	cv::imshow("display", image);
+	cv::waitKey(0);
 	//std::vector<int> output = nn.Evaluate(letterA);
 	/*for (auto letter : solutions)
 	{
@@ -105,7 +110,7 @@ int main()
 		std::cout << std::endl;
 	}*/
 	/////////////////////////
-	std::vector<int> output = nn.Evaluate(dataAdapter.adaptImageToDataset(image));
+	std::vector<int> output = nn.Evaluate(dataAdapter.adaptToHeatMap(image));
 	for (auto value : output)
 	{
 		std::cout << value << "   ";

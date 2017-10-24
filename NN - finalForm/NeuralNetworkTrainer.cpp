@@ -63,7 +63,8 @@ namespace BPN
 			GetSetAccuracyAndMSE(trainingData.m_generalizationSet, m_generalizationSetAccuracy, m_generalizationSetMSE);
 
 			std::cout << "Epoch :" << m_currentEpoch;
-			std::cout << " Training Set Accuracy:" << m_trainingSetAccuracy <<std::endl;
+			std::cout << " Training Set Accuracy:" << m_trainingSetAccuracy;
+			std::cout << " Generalization Set Accuracy:" << m_generalizationSetAccuracy << "%" << std::endl;
 
 			m_currentEpoch++;
 		}
@@ -162,6 +163,7 @@ namespace BPN
 				m_deltaInputHidden[weightIdx] = m_learningRate * m_pNetwork->m_inputNeurons[inputIdx] * m_errorGradientsHidden[hiddenIdx] + m_momentum * m_deltaInputHidden[weightIdx];
 			}
 		}
+		UpdateWeights();
 	}
 
 	void NetworkTrainer::UpdateWeights()
