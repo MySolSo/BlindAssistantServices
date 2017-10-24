@@ -93,7 +93,7 @@ std::vector<cv::Mat> NNTrainer::generateFilters(const char* pathToSetOfPics)
 	cv::Mat originalImageOfLetter, norm_image(norm_sizeX, norm_sizeY, CV_64F);
 	//cv::resize(image, norm_image, cv::Size(norm_sizeX, norm_sizeY));
 	//cvWaitKey(0);
-	images.read(image);
+	images.read(originalImageOfLetter);
 	if (images.isOpened())
 	{
 		if (images.read(originalImageOfLetter))

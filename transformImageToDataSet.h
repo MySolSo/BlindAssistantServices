@@ -7,7 +7,7 @@ namespace cv {
 
 class transformImageToDataSet
 {
-	int remapIntValueToUsedFormat(const int input, int minInRange, int maxInRange);
+	int remapIntValueToUsedFormat(const double input, int minInRange, int maxInRange);
 public:
 	transformImageToDataSet();
 	~transformImageToDataSet();

@@ -13,7 +13,7 @@
 
 int main()
 {
-	const cv::String name_of_files = "testLine.png";
+	const cv::String name_of_files = "testLine.jpg";
 
 	const auto image = cv::imread(name_of_files, CV_LOAD_IMAGE_COLOR);
 	assert(image.data);
@@ -33,7 +33,7 @@ int main()
 
 	ParseLetters parser(image);
 	int blackLimit = parser.getAverageBlackValue();
-	auto lineLetters = parser.getVectorOfLettersFromLine(toProcess,100);
+	//auto lineLetters = parser.getVectorOfLettersFromLine(toProcess,100);
 
 	/*for (auto letter : lineLetters)
 	{
@@ -42,19 +42,19 @@ int main()
 		cvWaitKey(0);
 	}*/
 
-     	auto preprocessedLines = preprocessor.getColorRefinedImageInLines(lineLetters[2]);//corneredImage);
+//     	auto preprocessedLines = preprocessor.getColorRefinedImageInLines(lineLetters[2]);//corneredImage);
+//
+//for(auto letter : preprocessedLines)
+//{
+//	cv::destroyWindow("BlackNiggaWindowForYouFella");
+//	cv::imshow("BlackNiggaWindowForYouFella", letter);
+//	cvWaitKey(0);
+//}
 
-for(auto letter : preprocessedLines)
-{
-	cv::destroyWindow("BlackNiggaWindowForYouFella");
-	cv::imshow("BlackNiggaWindowForYouFella", letter);
-	cvWaitKey(0);
-}
-
-
+	auto letterForTesting = cv::imread("letterD.jpg", CV_LOAD_IMAGE_COLOR);
 	transformImageToDataSet transformer;
 
-	auto data = transformer.adaptingImageToDataset(preprocessedLines[1]);
+	auto data = transformer.adaptingImageToDataset(letterForTesting);
 
 
 
@@ -79,7 +79,7 @@ for(auto letter : preprocessedLines)
 	"a","b","c","d","e","f","g","h"//,"i","j"
 	,"k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z" };
 
-	std::string path = "C:/Users/gyula/source/repos/BlindAssistantServices/BlindAssistantServices/training/upper/";
+	std::string path = "C:/Users/Vadim2/Documents/Visual Studio 2015/Projects/recognitionTemplate/experimentingWIthNNs/training/upper";
 	std::string extension = ".jpg";
 
 	//trainer.initFilterTablesGenerateFile("filters.txt");															   //  delete to add another filter set

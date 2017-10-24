@@ -18,11 +18,11 @@ transformImageToDataSet::~transformImageToDataSet()
 {
 }
 
-int transformImageToDataSet::remapIntValueToUsedFormat(const int input, int minInRange, int maxInRange)
+int transformImageToDataSet::remapIntValueToUsedFormat(const double input, int minInRange, int maxInRange)
 {
 	const int atrMinRange = 0, atrMaxRange = 15;
 
-	double intermediateValue = input / (maxInRange - minInRange);
+	double intermediateValue = (static_cast<double>(input)) / (maxInRange - minInRange);
 	int result = atrMinRange + (atrMaxRange - atrMinRange) * intermediateValue;
 
 	return result;
@@ -61,9 +61,14 @@ std::vector<int> transformImageToDataSet::adaptingImageToDataset(const cv::Mat& 
 			//auto x = binaryImg.at<int>(i,j);
 			//std::cout << static_cast<int>(x) << std::endl;
 		//	auto y = binaryImg.at<cv::Point>(i).y;
-
-			if (static_cast<int>(binaryImg.at<uchar>(i, j)) == 255)
+			auto currentPixel = static_cast<int>(binaryImg.at<uchar>(i, j));
+			/*if (currentPixel != 255)
 			{
+				cv::waitKey(0);
+			}*/
+			if (currentPixel == 0)
+			{
+
 				//sum of x coordinates ->needed for mean of x coordinates
 				onPixelsXCoordinateSum += j;
 
@@ -84,6 +89,8 @@ std::vector<int> transformImageToDataSet::adaptingImageToDataset(const cv::Mat& 
 				if (j < minimumXPosition)
 				{
 					minimumXPosition = j;
+					cv::imshow("letter test", binaryImg);
+					cv::waitKey(0);
 				}
 				else if (j > maximumXPosition)
 				{
@@ -104,8 +111,8 @@ std::vector<int> transformImageToDataSet::adaptingImageToDataset(const cv::Mat& 
 	const int boxWidth = maximumXPosition - minimumXPosition;
 	const int boxHeight = maximumYPosition - minimumYPosition;
 	const int numberOfPixelsInBox = boxWidth * boxHeight;
-	const int xBar = onPixelsXCoordinateSum / numberOfPixelsInBox;
-	const int yBar = onPixelsYCoordinateSum / numberOfPixelsInBox;
+	const double xBar = onPixelsXCoordinateSum / numberOfPixelsInBox;
+	const double yBar = onPixelsYCoordinateSum / numberOfPixelsInBox;
 	unsigned int varianceOfXCoordBeforeDiv = 0;
 	unsigned int varianceOfYCoordBeforeDiv = 0;
 
@@ -125,24 +132,33 @@ std::vector<int> transformImageToDataSet::adaptingImageToDataset(const cv::Mat& 
 	double maximumPossibleMeanForAtr12 = 0;
 	double maximumPossibleRangeForAtr14 = 0;
 	double maximumPossibleRangeForAtr16 = 0;
+	double maximumPossibleMeanForAtr6 = 0;
+	double maximumPossibleMeanForAtr7 = 0;
 
 	bool isFirstIterationFinished = false;
 	for (auto i = minimumYPosition; i < maximumYPosition; ++i)
 	{
 		for (auto j = minimumXPosition; j < maximumXPosition; ++j)
 		{
-			if (static_cast<int>(binaryImg.at<uchar>(i, j)) == 255)
+			maximumPossibleMeanForAtr6 += j;
+			maximumPossibleMeanForAtr7 += i;
+			maximumPossibleMeanForAtr10 += i*j;
+			maximumPossibleMeanForAtr8 += j * j;
+			maximumPossibleMeanForAtr9 += i * i;
+			maximumPossibleMeanForAtr11 += j*j*i;
+			maximumPossibleMeanForAtr12 += i*i*j;
+			if (static_cast<int>(binaryImg.at<uchar>(i, j)) == 0)
 			{
 				varianceOfXCoordBeforeDiv += ((j - xBar)*(j - xBar));
 				varianceOfYCoordBeforeDiv += ((i - yBar)*(i - yBar));
-
 			}
-			if (static_cast<int>(binaryImg.at<uchar>(i, j)) == 255 && lastOffPixelXCoord == (j - 1) && lastOffPixelYCoord == i)
+			auto currentPixel = static_cast<int>(binaryImg.at<uchar>(i, j)) == 0;
+			if (currentPixel && lastOffPixelXCoord == (j - 1) && lastOffPixelYCoord == i)
 			{
 				++numberOfEdgesX;
 				sumOfEdgeYCoord += i;
 			}
-			if (static_cast<int>(binaryImg.at<uchar>(i, j)) == 255 && lastOffPixelYCoord == (i - 1) && lastOffPixelXCoord == j)
+			if (currentPixel && /*lastOffPixelYCoord == (i - 1)*/ static_cast<int>(binaryImg.at<uchar>(i + 1, j)) == 255 /*&& lastOffPixelXCoord == j*/)
 			{
 				++numberOfEdgesY;
 				sumOfEdgeXCoord += j;
@@ -154,13 +170,7 @@ std::vector<int> transformImageToDataSet::adaptingImageToDataset(const cv::Mat& 
 			}
 			if (!isFirstIterationFinished)
 			{
-				maximumPossibleMeanForAtr8 += j * j;
-				maximumPossibleMeanForAtr9 += i * i;
-
-				maximumPossibleMeanForAtr10 += i*j;
-
-				maximumPossibleMeanForAtr11 += j*j*i;
-				maximumPossibleMeanForAtr12 += i*i*j;
+				
 
 			}
 			if (j % 2 != 0)
@@ -168,12 +178,12 @@ std::vector<int> transformImageToDataSet::adaptingImageToDataset(const cv::Mat& 
 				maximumPossibleRangeForAtr16 += j;
 			}
 
+			if (i % 2 != 0)
+			{
+				maximumPossibleRangeForAtr14 += i;
+			}
 		}
-		if (i % 2 != 0)
-		{
-			maximumPossibleRangeForAtr14 += i;
-		}
-		if(i == 1)
+		if (i == 1)
 		{
 			isFirstIterationFinished = true;
 		}
@@ -181,18 +191,20 @@ std::vector<int> transformImageToDataSet::adaptingImageToDataset(const cv::Mat& 
 	//const int varianceOfXCoord = varianceOfXCoordBeforeDiv / countOfOnPixels;
 	//const int varianceOfYCoord = varianceOfYCoordBeforeDiv / countOfOnPixels;
 
-	const int varianceOfXCoord = sumOfXSquaredProduct / countOfOnPixels;
-	const int varianceOfYCoord = sumOfYSquaredProduct / countOfOnPixels;
+	const double varianceOfXCoord = sumOfXSquaredProduct / numberOfPixelsInBox;
+	const double varianceOfYCoord = sumOfYSquaredProduct / numberOfPixelsInBox;
 
 	/*const int correlationOfXY = ((countOfOnPixels*sumOfXYProduct) - (onPixelsXCoordinateSum * onPixelsYCoordinateSum)) /
 	(sqrt(((countOfOnPixels*sumOfXSquaredProduct) - (onPixelsXCoordinateSum*onPixelsXCoordinateSum)) *
 	((countOfOnPixels*sumOfYSquaredProduct) - (onPixelsYCoordinateSum*onPixelsYCoordinateSum))));*/
 
-	const int correlationOfXY = sumOfXYProduct / countOfOnPixels;
-	const int x2ybr = sumX2YBar / countOfOnPixels;
-	const int xy2br = sumXY2Bar / countOfOnPixels;
-	const int verticalEdgesMean = numberOfEdgesY / boxHeight;
-	const int horizontalEdgesMean = numberOfEdgesX / boxWidth;
+	const double correlationOfXY = sumOfXYProduct / numberOfPixelsInBox;
+	const double x2ybr = sumX2YBar / numberOfPixelsInBox;
+	const double xy2br = sumXY2Bar / numberOfPixelsInBox;
+ 
+
+	const double verticalEdgesMean = numberOfEdgesY / ((boxHeight /2. ) * boxWidth);
+	const double horizontalEdgesMean = numberOfEdgesX / ((boxWidth /2.) * boxHeight);
 
 	const int atrMinRange = 0, atrMaxRange = 15;
 
@@ -200,22 +212,23 @@ std::vector<int> transformImageToDataSet::adaptingImageToDataset(const cv::Mat& 
 	int atr_2 = remapIntValueToUsedFormat(minimumYPosition, 0, binaryImg.rows);
 	int atr_3 = remapIntValueToUsedFormat(boxWidth, 0, binaryImg.cols);
 	int atr_4 = remapIntValueToUsedFormat(boxHeight, 0, binaryImg.rows);
-	int atr_5 = remapIntValueToUsedFormat(countOfOnPixels, 0, binaryImg.cols * binaryImg.rows);
+	int atr_5 = remapIntValueToUsedFormat(countOfOnPixels, 0, boxWidth * boxHeight);
 
-	double maximumPossibleMeanForAtr6 = ((maximumXPosition * (maximumXPosition + 1)) / 2.) - ((minimumXPosition *(minimumXPosition + 1)) / 2.);
-	int atr_6 = remapIntValueToUsedFormat(xBar, minimumXPosition, maximumPossibleMeanForAtr6);
+	
+	int atr_6 = remapIntValueToUsedFormat(xBar, minimumXPosition, maximumPossibleMeanForAtr6 / static_cast<double>( numberOfPixelsInBox));
 
-	double maximumPossibleMeanForAtr7 = ((maximumYPosition * (maximumYPosition + 1)) / 2.) - ((minimumYPosition * (minimumYPosition + 1)) / 2.);
-	int atr_7 = remapIntValueToUsedFormat(yBar, minimumYPosition, maximumPossibleMeanForAtr7);
+	int atr_7 = remapIntValueToUsedFormat(yBar, minimumYPosition, maximumPossibleMeanForAtr7 / static_cast<double>(numberOfPixelsInBox));
 
-	int atr_8 = remapIntValueToUsedFormat(varianceOfXCoord, minimumXPosition*minimumXPosition, maximumPossibleMeanForAtr8);
-	int atr_9 = remapIntValueToUsedFormat(varianceOfYCoord, minimumYPosition*minimumYPosition, maximumPossibleMeanForAtr9);
-	int atr_10 = remapIntValueToUsedFormat(correlationOfXY, minimumXPosition*minimumYPosition, maximumPossibleMeanForAtr10);
-	int atr_11 = remapIntValueToUsedFormat(x2ybr, minimumXPosition*minimumXPosition*minimumYPosition, maximumPossibleMeanForAtr11);
-	int atr_12 = remapIntValueToUsedFormat(xy2br, minimumXPosition*minimumYPosition*minimumYPosition, maximumPossibleMeanForAtr12);
-	int atr_13 = remapIntValueToUsedFormat(horizontalEdgesMean, 0, boxWidth / 2);
+	int atr_8 = remapIntValueToUsedFormat(varianceOfXCoord, minimumXPosition*minimumXPosition, maximumPossibleMeanForAtr8 / static_cast<double>(numberOfPixelsInBox));
+	int atr_9 = remapIntValueToUsedFormat(varianceOfYCoord, minimumYPosition*minimumYPosition, maximumPossibleMeanForAtr9 / static_cast<double>(numberOfPixelsInBox));
+	int atr_10 = remapIntValueToUsedFormat(correlationOfXY, minimumXPosition*minimumYPosition, maximumPossibleMeanForAtr10 / static_cast<double>(numberOfPixelsInBox));
+	int atr_11 = remapIntValueToUsedFormat(x2ybr, minimumXPosition*minimumXPosition*minimumYPosition, maximumPossibleMeanForAtr11 / static_cast<double>(numberOfPixelsInBox));
+
+ 
+	int atr_12 = remapIntValueToUsedFormat(xy2br, minimumXPosition*minimumYPosition*minimumYPosition, maximumPossibleMeanForAtr12 / static_cast<double>(numberOfPixelsInBox));
+	int atr_13 = remapIntValueToUsedFormat(horizontalEdgesMean, 0, boxWidth / 2.);
 	int atr_14 = remapIntValueToUsedFormat(sumOfEdgeYCoord, minimumYPosition + 1, maximumPossibleRangeForAtr14);
-	int atr_15 = remapIntValueToUsedFormat(verticalEdgesMean, 0, boxHeight / 2);
+	int atr_15 = remapIntValueToUsedFormat(verticalEdgesMean, 0, boxHeight / 2.);
 	int atr_16 = remapIntValueToUsedFormat(sumOfEdgeXCoord, minimumXPosition + 1, maximumPossibleRangeForAtr16);
 
 	std::vector<int> imageAtr;
